@@ -16,16 +16,24 @@ import TaskForm from './taskForm';
 
 export default function AddTaskContainer( props ) {
 
+  const {
+    users,
+    tags
+  } = props;
+
   const [ search, setSearch ] = useState( "" );
   const [ addTaskModalOpen, showAddTaskModal ] = useState( false );
 
   const toggleAddTaskModal = () => showAddTaskModal( !addTaskModalOpen );
 
-  const addNewTask = ( title, description, status ) => {
+  const addNewTask = ( title, description, status, assigned, tag, actions ) => {
     TasksCollection.insert( {
       title,
       description,
-      status
+      status,
+      assigned,
+      tag,
+      actions
     } );
     showAddTaskModal( false );
   }
@@ -36,12 +44,12 @@ export default function AddTaskContainer( props ) {
 
   return (
       <div>
-    <button onClick={toggleAddTaskModal}> + Task </button>
+      <button onClick={toggleAddTaskModal}> + Task </button>
       <Modal isOpen={addTaskModalOpen} toggle={toggleAddTaskModal}>
-          <ModalBody>
-            <TaskForm onSubmit={addNewTask} onCancel={closeModal}/>
-          </ModalBody>
-        </Modal>
-</ div>
+        <ModalBody>
+          <TaskForm users={users} tags={tags} onSubmit={addNewTask} onCancel={closeModal}/>
+        </ModalBody>
+      </Modal>
+      </ div>
   );
 };

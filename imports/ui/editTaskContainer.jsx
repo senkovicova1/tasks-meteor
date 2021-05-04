@@ -20,6 +20,8 @@ export default function EditTaskContainer( props ) {
   const {
     task,
     setChosenTask,
+    users,
+    tags,
   } = props;
 
   const [ search, setSearch ] = useState( "" );
@@ -33,7 +35,8 @@ export default function EditTaskContainer( props ) {
     }
   }, [ task ] )
 
-  const editTask = ( title, description, status ) => {
+  const editTask = ( title, description, status, assigned, tag, actions ) => {
+    console.log( actions );
     let data = {};
     if ( task.title !== title ) {
       data.title = title;
@@ -44,6 +47,13 @@ export default function EditTaskContainer( props ) {
     if ( task.status !== status ) {
       data.status = status;
     }
+    if ( task.assigned.length != assigned.length || task.assigned.filter( user => !assigned.includes( user._id ) ) ) {
+      data.assigned = assigned;
+    }
+    if ( !task.tag || ( task.tag._id !== tag ) ) {
+      data.tag = tag;
+    }
+    data.actions = actions;
     TasksCollection.update( task._id, {
       $set: {
         ...data
@@ -59,7 +69,7 @@ export default function EditTaskContainer( props ) {
   return (
     <Modal isOpen={editTaskModalOpen} toggle={() => setChosenTask( null )}>
       <ModalBody>
-        <TaskForm {...task} onSubmit={editTask} onCancel={closeModal}/>
+        <TaskForm {...task} users={users} tags={tags} onSubmit={editTask} onCancel={closeModal}/>
       </ModalBody>
     </Modal>
   );
