@@ -1,9 +1,9 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import TaskList from './taskList';
+import Navigation from './navigation';
 
 export const App = () => (
   <div>
-    <TaskList/>
+    <Navigation />
   </div>
 );

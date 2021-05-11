@@ -35,8 +35,7 @@ export default function EditTaskContainer( props ) {
     }
   }, [ task ] )
 
-  const editTask = ( title, description, status, assigned, tag, actions ) => {
-    console.log( actions );
+  const editTask = ( title, description, status, assigned, tag, actions, materials, deadlines ) => {
     let data = {};
     if ( task.title !== title ) {
       data.title = title;
@@ -54,12 +53,22 @@ export default function EditTaskContainer( props ) {
       data.tag = tag;
     }
     data.actions = actions;
+    data.materials = materials;
+    data.deadlines = deadlines;
     TasksCollection.update( task._id, {
       $set: {
         ...data
       }
     } )
     setChosenTask( null );
+  }
+
+  const removeTask = ( taskId ) => {
+    if ( window.confirm( "Are you sure you want to permanently remove this task?" ) ) {
+      TasksCollection.remove( {
+        _id: taskId
+      } );
+    }
   }
 
   const closeModal = () => {
@@ -69,7 +78,7 @@ export default function EditTaskContainer( props ) {
   return (
     <Modal isOpen={editTaskModalOpen} toggle={() => setChosenTask( null )}>
       <ModalBody>
-        <TaskForm {...task} users={users} tags={tags} onSubmit={editTask} onCancel={closeModal}/>
+        <TaskForm {...task} users={users} tags={tags} onSubmit={editTask} onCancel={closeModal} onRemove={removeTask}/>
       </ModalBody>
     </Modal>
   );
