@@ -129,8 +129,6 @@ export default function TaskList( props ) {
         .includes( searchDeadlines.toLowerCase() ) ) ) ) )
     .filter( task => !showMyTasks || task.assigned.some( a => a._id === userId ) ), [ tasks, search ] );
 
-  console.log( userId );
-
   return (
     <div style={{width: "calc(100% - 200px)", display: 'inline-block', verticalAlign: "top"}}>
       <section>
