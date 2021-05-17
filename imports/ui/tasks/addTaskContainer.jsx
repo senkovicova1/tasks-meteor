@@ -4,6 +4,10 @@ import React, {
 } from 'react';
 
 import {
+  Icon
+} from '@fluentui/react/lib/Icon';
+
+import {
   TasksCollection
 } from '/imports/api/tasksCollection';
 
@@ -13,6 +17,10 @@ import {
 } from 'reactstrap';
 
 import TaskForm from './taskForm';
+
+import {
+  LinkButton
+} from '../../other/styles/styledComponents';
 
 export default function AddTaskContainer( props ) {
 
@@ -46,7 +54,7 @@ export default function AddTaskContainer( props ) {
 
   return (
       <div>
-      <button onClick={toggleAddTaskModal}> + Task </button>
+      <LinkButton onClick={toggleAddTaskModal}> <Icon iconName="Add"/> Task </LinkButton>
       <Modal isOpen={addTaskModalOpen} toggle={toggleAddTaskModal}>
         <ModalBody>
           <TaskForm users={users} tags={tags} onSubmit={addNewTask} onCancel={closeModal}/>

@@ -12,7 +12,15 @@ import {
   ModalBody
 } from 'reactstrap';
 
+import {
+  Icon
+} from '@fluentui/react/lib/Icon';
+
 import TagForm from './tagForm';
+
+import {
+  LinkButton
+} from '../../other/styles/styledComponents';
 
 export default function AddTagContainer( props ) {
 
@@ -33,7 +41,7 @@ export default function AddTagContainer( props ) {
 
   return (
       <div>
-      <button onClick={toggleAddTagModal}> + Tag </button>
+      <LinkButton onClick={toggleAddTagModal}> <Icon iconName="Add"/> Tag </LinkButton>
       <Modal isOpen={addTagModalOpen} toggle={toggleAddTagModal}>
         <ModalBody>
           <TagForm onSubmit={addNewTag} onCancel={closeModal}/>

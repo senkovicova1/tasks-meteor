@@ -12,7 +12,15 @@ import {
   ModalBody
 } from 'reactstrap';
 
+import {
+  Icon
+} from '@fluentui/react/lib/Icon';
+
 import UserForm from './userForm';
+
+import {
+  LinkButton
+} from '../../other/styles/styledComponents';
 
 export default function AddUserContainer( props ) {
 
@@ -40,7 +48,7 @@ export default function AddUserContainer( props ) {
 
   return (
       <div>
-      <button onClick={toggleAddUserModal}> + User </button>
+      <LinkButton onClick={toggleAddUserModal}> <Icon iconName="Add"/> User </LinkButton>
       <Modal isOpen={addUserModalOpen} toggle={toggleAddUserModal}>
         <ModalBody>
           <UserForm onSubmit={addNewUser} onCancel={closeModal}/>

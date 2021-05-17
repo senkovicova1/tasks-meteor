@@ -17,6 +17,10 @@ import Sidebar from './sidebar';
 import TaskList from './tasks/taskList';
 import UserList from './users/userList';
 
+import {
+  Content
+} from '../other/styles/styledComponents';
+
 export default function MainPage( props ) {
   const user = useTracker( () => Meteor.user() );
 
@@ -24,13 +28,15 @@ export default function MainPage( props ) {
     return <Login />
   }
   return (
-    <div style={{width: "80%", marginLeft: 'auto', marginRight: 'auto'}}>
+    <div>
       <Header />
+      <Content>
         <BrowserRouter>
-          <Route path="/" component={Sidebar} />
+          <Route exact path={["/", "/tasks", "/tasks/:tagID", "/tasks/:tagID/:listType", "/users", "/users/:userID"]} component={Sidebar} />
           <Route exact path={["/", "/tasks", "/tasks/:tagID", "/tasks/:tagID/:listType"]} component={TaskList} />
           <Route exact path={["/users", "/users/:userID"]} component={UserList} />
         </BrowserRouter>
+      </Content>
     </div>
   );
 };

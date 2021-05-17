@@ -9,8 +9,8 @@ import {
 import moment from 'moment';
 
 import {
-  FontAwesomeIcon
-} from '@fortawesome/react-fontawesome'
+  Icon
+} from '@fluentui/react/lib/Icon';
 
 import {
   useTracker
@@ -29,6 +29,17 @@ import AddTagContainer from './tags/addTagContainer';
 import AddUserContainer from './users/addUserContainer';
 import EditTagContainer from './tags/editTagContainer';
 
+import {
+  WHOLE_TABLE,
+  WITH_ACTIONS,
+  WITH_MATERIALS
+} from '../other/constants';
+
+import {
+  Sidebar as StyledSidebar,
+  SidebarLink
+} from '../other/styles/styledComponents';
+
 export default function Sidebar( props ) {
 
   const {
@@ -39,8 +50,6 @@ export default function Sidebar( props ) {
     .fetch() );
   const tags = useTracker( () => TagsCollection.find( {} )
     .fetch() );
-  //  const users = useTracker( () => UsersCollection.find( {} )
-  // .fetch() );
   const users = [];
 
   const [ search, setSearch ] = useState( "" );
@@ -61,32 +70,42 @@ export default function Sidebar( props ) {
       .includes( search.toLowerCase() ) ), [ tasks, search ] );
 
   const tagID = match.params.tagID ? match.params.tagID : 'all';
+  const listType = match.params.listType ? match.params.listType : 'all';
 
   return (
-    <div style={{width: "200px", display: 'inline-block', verticalAlign: "top"}}>
+    <StyledSidebar>
       <ul>
-        <li key="whole">
-          <Link to={`/tasks/${tagID}/whole`}>Whole table</Link>
-        </li>
-        <li key="actions">
-          <Link to={`/tasks/${tagID}/actions`}>Actions</Link>
-        </li>
-          <li key="materials">
-            <Link to={`/tasks/${tagID}/materials`}>Materials</Link>
-          </li>
-          <li key="all"><Link to="/tasks">All tags</Link></li>
-          {tags.map(tag => <li key={tag._id}><Link to={`/tasks/${tag._id}`}>{tag.title}</Link>
-    <FontAwesomeIcon icon={['fas', 'cogs']} onClick={() => setChosenTag(tag)} /></li>)}
-              <li key="addTag">
-                <AddTagContainer/>
-              </li>
-              <li key="users"><Link to="/users">Users</Link></li>
-                <li key="addUser">
-                  <AddUserContainer/>
-                </li>
+        <SidebarLink key="whole" active={listType === WHOLE_TABLE}>
+          <Link to={`/tasks/${tagID}/all`}><Icon iconName="TriangleSolidRight12"/> Whole table</Link>
+        </SidebarLink>
+        <SidebarLink key="actions" active={listType === WITH_ACTIONS}>
+          <Link to={`/tasks/${tagID}/actions`}><Icon iconName="TriangleSolidRight12"/> Actions</Link>
+        </SidebarLink>
+        <SidebarLink key="materials" active={listType === WITH_MATERIALS}>
+          <Link to={`/tasks/${tagID}/materials`}><Icon iconName="ShoppingCartSolid"/> Materials</Link>
+        </SidebarLink>
+        <SidebarLink key="all" active={tagID === "all"}>
+          <Link to="/tasks"><Icon iconName="FabricFolderFill"/> All tags</Link>
+        </SidebarLink>
+        {tags.map(tag => (
+          <SidebarLink key={tag._id} active={tagID === tag._id}>
+            <Link to={`/tasks/${tag._id}${listType ? "/" + listType : ""}`}><Icon iconName="FabricFolderFill"/> {tag.title}</Link>
+            <Icon iconName="Settings" onClick={() => setChosenTag(tag)} />
+          </SidebarLink>
+        ))}
+        <hr />
+        <SidebarLink key="users"  active={match.url.includes("users")}>
+          <Link to="/users"><Icon iconName="Settings"/> Users</Link>
+        </SidebarLink>
+        <SidebarLink key="addTag">
+          <AddTagContainer/>
+        </SidebarLink>
+        <SidebarLink key="addUser">
+          <AddUserContainer/>
+        </SidebarLink>
       </ul>
 
-        <EditTagContainer tag={chosenTag} setChosenTag={setChosenTag}/>
-    </div>
+      <EditTagContainer tag={chosenTag} setChosenTag={setChosenTag}/>
+    </StyledSidebar>
   );
 };
