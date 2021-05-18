@@ -7,6 +7,13 @@ import {
   isEmail
 } from '../../other/helperFunctions.js';
 
+import {
+  Form,
+  Input,
+  ButtonRow,
+  FullButton,
+} from "../../other/styles/styledComponents";
+
 export default function UserForm( props ) {
 
   const {
@@ -46,13 +53,14 @@ export default function UserForm( props ) {
 
 
   return (
-    <div>
+    <Form>
 
       <section>
         <label htmlFor="name">Name</label>
-        <input
+        <Input
           id="name"
           name="name"
+          placeholder="Enter name"
           value={name}
           onChange={(e) => setName(e.target.value)}
           />
@@ -60,9 +68,10 @@ export default function UserForm( props ) {
 
       <section>
         <label htmlFor="surname">Surname</label>
-        <input
+        <Input
           id="surname"
           name="surname"
+          placeholder="Enter surname"
           value={surname}
           onChange={(e) =>  setSurname(e.target.value)}
           />
@@ -70,27 +79,28 @@ export default function UserForm( props ) {
 
       <section>
         <label  htmlFor="email">Email</label>
-          <input
+          <Input
               name="email"
+              placeholder="Enter email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
           />
       </section>
 
       <section>
-        <label htmlFor="showMyTasks">Show only my tasks by default</label>
-        <input
+        <Input
           id="showMyTasks"
           type="checkbox"
           name="showMyTasks"
           checked={showMyTasks}
           onChange={() =>  setShowMyTasks(!showMyTasks)}
           />
+        <label htmlFor="showMyTasks">Show only my tasks by default</label>
       </section>
 
 <section>
       <label htmlFor="password1">Password</label>
-        <input
+        <Input
           type="password"
           placeholder="Password"
           name="password1"
@@ -101,7 +111,7 @@ export default function UserForm( props ) {
 
         <section>
       <label htmlFor="password2">Repeat password</label>
-              <input
+              <Input
                 type="password"
                 placeholder="Repeat password"
                 name="password2"
@@ -110,13 +120,15 @@ export default function UserForm( props ) {
               />
           </section>
 
+<ButtonRow>
           {onCancel &&
-      <button onClick={onCancel}>Cancel</button>
+      <FullButton colour="grey" onClick={(e) => {e.preventDefault(); onCancel()}}>Cancel</FullButton>
     }
       {onRemove &&
-        <button onClick={() => {onRemove(userId); onCancel();}}>Delete</button>
+        <FullButton colour="red" onClick={(e) => {e.preventDefault(); onRemove(userId); onCancel();}}>Delete</FullButton>
       }
-      <button
+      <FullButton
+        colour=""
         disabled={name.length + surname.length + email.length === 0 || !isEmail(email) || password1 !== password2}
         onClick={(e) => {
           e.preventDefault();
@@ -130,8 +142,9 @@ export default function UserForm( props ) {
       }}
         >
         Save
-      </button>
+      </FullButton>
+    </ButtonRow>
 
-    </div>
+    </Form>
   );
 };

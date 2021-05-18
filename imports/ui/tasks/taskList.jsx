@@ -170,18 +170,18 @@ export default function TaskList( props ) {
       <SearchSection>
         <Input width="30%" placeholder="Search" value={search} onChange={(e) => setSearch(e.target.value)} />
         <AddTaskContainer users={users} tags={tags} />
+        <section>
+          <label htmlFor="showMyTasks">My tasks</label>
+          <Input
+            id="showMyTasks"
+            type="checkbox"
+            name="showMyTasks"
+            checked={showMyTasks}
+            onChange={() =>  setShowMyTasks(!showMyTasks)}
+            />
+        </section>
       </SearchSection>
       <EditTaskContainer users={users} tags={tags} task={chosenTask} setChosenTask={setChosenTask}/>
-      <section>
-        <label htmlFor="showMyTasks">Show only my tasks by default</label>
-        <Input
-          id="showMyTasks"
-          type="checkbox"
-          name="showMyTasks"
-          checked={showMyTasks}
-          onChange={() =>  setShowMyTasks(!showMyTasks)}
-          />
-      </section>
       <table>
         <thead>
           <tr>

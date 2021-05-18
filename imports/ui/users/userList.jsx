@@ -10,6 +10,12 @@ import {
 import AddUserContainer from './addUserContainer';
 import EditUserContainer from './editUserContainer';
 
+import {
+  List,
+  SearchSection,
+  Input
+} from "../../other/styles/styledComponents";
+
 export default function UserList( props ) {
   const users = useTracker( () => Meteor.users.find( {} )
     .fetch() );
@@ -20,8 +26,6 @@ export default function UserList( props ) {
   const [ searchEmail, setSearchEmail ] = useState( "" );
 
   const [ chosenUser, setChosenUser ] = useState( null );
-
-  console.log( users );
 
   const filteredUsers = useMemo( () =>
     users.filter( user =>
@@ -40,30 +44,31 @@ export default function UserList( props ) {
 
 
   return (
-    <div style={{width: "calc(100% - 200px)", display: 'inline-block', verticalAlign: "top"}}>
-      <section>
-        <input value={search} onChange={(e) => setSearch(e.target.value)} />
-      </section>
-      <AddUserContainer/>
+    <List>
+      <h2>Users</h2>
+        <SearchSection>
+          <Input width="30%" placeholder="Search" value={search} onChange={(e) => setSearch(e.target.value)} />
+          <AddUserContainer/>
+      </SearchSection>
       <EditUserContainer user={chosenUser} setChosenUser={setChosenUser}/>
       <table>
         <thead>
           <tr>
-            <th>surname</th>
-            <th>name</th>
-            <th>email</th>
+            <th>Surname</th>
+            <th>Name</th>
+            <th>Email</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <th>
-              <input value={searchSurname} onChange={(e) => setSearchSurname(e.target.value)} />
+              <Input value={searchSurname} onChange={(e) => setSearchSurname(e.target.value)} />
             </th>
             <th>
-              <input value={searchName} onChange={(e) => setSearchName(e.target.value)} />
+              <Input value={searchName} onChange={(e) => setSearchName(e.target.value)} />
             </th>
             <th>
-              <input value={searchEmail} onChange={(e) => setSearchEmail(e.target.value)} />
+              <Input value={searchEmail} onChange={(e) => setSearchEmail(e.target.value)} />
             </th>
           </tr>
           {filteredUsers.map(user =>
@@ -75,6 +80,6 @@ export default function UserList( props ) {
             )}
           </tbody>
         </table>
-      </div>
+      </List>
   );
 };

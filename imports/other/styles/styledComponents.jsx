@@ -51,6 +51,19 @@ export const Content = styled.main `
 `;
 
 
+export const ButtonRow = styled.section `
+display: flex;
+justify-content: flex-start;
+
+button:first-child{
+  margin-right: 1em;
+}
+
+button:last-child{
+  margin-left: auto;
+}
+`;
+
 export const LinkButton = styled.button `
   color: ${(props) => props.whiteFont ? "white" : basicBlueColour};
   padding: 0px;
@@ -61,6 +74,23 @@ export const LinkButton = styled.button `
   line-height: 1em;
   display: flex;
   align-items: center;
+  i {
+    margin-right: 0.3em;
+  }
+`;
+
+export const FullButton = styled.button `
+  color: white;
+  padding: 0px;
+  height: 1em;
+  background-color: ${(props) => props.colour ? props.colour : "#0078d4" } !important;
+  outline: none !important;
+  border: none !important;
+  line-height: 2em;
+  height: 2em;
+  display: flex;
+  align-items: center;
+  padding: 0px 0.5em;
   i {
     margin-right: 0.3em;
   }
@@ -101,9 +131,14 @@ verticalAlign: top;
 
 table {
   line-height: 2em;
+  color: #333333;
 
   input {
     width: 100%;
+  }
+
+  tr{
+    line-height: 2em;
   }
 
   th {
@@ -146,11 +181,139 @@ input {
 }
 `;
 
+export const Form = styled.form `
+padding: 30px 40px;
+
+hr{
+  margin: 0em 0em 1em 0em;
+}
+
+section {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  min-height: 3em;
+
+  label{
+    margin: 0px;
+    font-weight: 500;
+    width: 15%;
+  }
+  input, &>div {
+    width: 85%;
+  }
+
+input[type=checkbox] + label{
+    width: 30%;
+    order: -1;
+  }
+}
+`;
+
+export const FormTable = styled.table `
+  line-height: 2em;
+  color: #333333;
+  width: 100%;
+  margin-bottom: 2em;
+
+input[type=text], input[type=number], input[type=datetime-local]{
+  width: 100%;
+}
+
+  td{
+    line-height: 2em;
+    height: 2em;
+    align-tems: center;
+  }
+
+  th{
+    font-weight: normal;
+    font-size: 0.8em;
+  }
+
+  th:first-child {
+    font-weight: 500;
+    font-size: 1em;
+  }
+
+  thead>tr{
+    border-bottom: 2px solid ${backgroundColour};
+  }
+
+  tbody>tr:not(:last-of-type){
+    border-bottom: 1px solid ${backgroundColour};
+
+    td:first-of-type{
+      width: 2em;
+  }
+  }
+  td:last-of-type{
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    button:first-child{
+      margin-left: auto;
+    }
+
+`;
+
 export const Input = styled.input `
 background-color: white !important;
 outline: none !important;
-border: none !important;
+border: 1px solid transparent;
 width: ${(props) => props.width ? props.width : "auto"};
-height: 2em;
 padding-left: 0.4em;
+
+&:focus{
+  border: 1px solid ${basicBlueColour} !important;
+}
+
+&[type=checkbox]{
+    height: 1.3em;
+    width: 1.3em;
+}
+`;
+
+export const Textarea = styled.textarea `
+background-color: white !important;
+outline: none !important;
+border: 1px solid transparent;
+width: ${(props) => props.width ? props.width : "auto"};
+padding-left: 0.4em;
+
+&:focus{
+  border: 1px solid ${basicBlueColour} !important;
+}
+`;
+
+export const TitleInput = styled( Input )
+`
+background-color: transparent !important;
+outline: none !important;
+border: none !important;
+width: ${(props) => props.width ? props.width : "100%"};
+height: 2em;
+font-size: 2em;
+font-weight: lighter;
+padding-left: 0em;
+`;
+
+export const GroupButton = styled.button `
+  display: inline;
+  background-color: ${(props) => props.colour ? props.colour : "white"};
+  color: ${(props) => props.colour ? "white" : basicBlueColour};
+  outline: none !important;
+  border: 1px solid ${(props) => props.colour ? props.colour : basicBlueColour};
+
+  border-radius: 0px;
+
+  &:first-of-type{
+    border-radius: 5px 0px 0px 5px;
+    border-right: 0px;
+  }
+
+  &:last-of-type{
+    border-left: 0px;
+    border-radius: 0px 5px 5px 0px;
+  }
 `;

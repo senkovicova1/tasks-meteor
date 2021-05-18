@@ -3,6 +3,13 @@ import React, {
   useEffect,
 } from 'react';
 
+import {
+  Form,
+  Input,
+  ButtonRow,
+  FullButton,
+} from "../../other/styles/styledComponents";
+
 export default function TagForm( props ) {
 
   const {
@@ -39,13 +46,14 @@ export default function TagForm( props ) {
 
 
   return (
-    <div>
+    <Form>
 
       <section>
         <label htmlFor="title">Title</label>
-        <input
+        <Input
           id="title"
           name="title"
+          type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           />
@@ -53,9 +61,10 @@ export default function TagForm( props ) {
 
       <section>
         <label htmlFor="description">Description</label>
-        <input
+        <Input
           id="description"
           name="description"
+          type="text"
           value={description}
           onChange={(e) =>  setDescription(e.target.value)}
           />
@@ -63,7 +72,7 @@ export default function TagForm( props ) {
 
       <section>
         <label  htmlFor="color">Color</label>
-          <input
+          <Input
               type="color"
               name="color"
               placeholder="Choose colour"
@@ -72,21 +81,25 @@ export default function TagForm( props ) {
           />
       </section>
 
-      <button onClick={onCancel}>Cancel</button>
+<ButtonRow>
+
+      <FullButton colour="grey" onClick={(e) => {e.preventDefault(); onCancel();}}>Cancel</FullButton>
       {onRemove &&
-        <button onClick={() => {onRemove(tagId); onCancel();}}>Delete</button>
+        <FullButton colour="red" onClick={(e) => {e.preventDefault(); onRemove(tagId); onCancel();}}>Delete</FullButton>
       }
-      <button
+      <FullButton
+        colour=""
         disabled={title.length === 0}
-        onClick={() => onSubmit(
+        onClick={(e) => {e.preventDefault(); onSubmit(
           title,
           description,
           color,
-        )}
+        );}}
         >
         Save
-      </button>
+      </FullButton>
+    </ButtonRow>
 
-    </div>
+    </Form>
   );
 };

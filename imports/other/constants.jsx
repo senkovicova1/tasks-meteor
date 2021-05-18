@@ -80,3 +80,21 @@ export const columns = {
 export const ALL_COLUMNS = [ columns.STATUS, columns.TITLE, columns.DESCRIPTION, columns.ACTIONS, columns.DURATION, columns.DEADLINES, columns.MATERIAL, columns.ASSIGNED ];
 export const ACTIONS_COLUMNS = [ columns.STATUS, columns.TITLE, columns.DESCRIPTION, columns.ACTIONS, columns.DURATION, columns.DEADLINES, columns.MATERIAL, columns.ASSIGNED ];
 export const MATERIAL_COLUMNS = [ columns.MATERIAL, columns.TITLE, columns.STATUS, columns.ASSIGNED ];
+
+export const statuses = [
+  {
+    label: "Open",
+    value: "open",
+    colour: "#00b294"
+  },
+  {
+    label: "Pending",
+    value: "pending",
+    colour: "#de963c"
+    },
+  {
+    label: "Closed",
+    value: "closed",
+    colour: "#6f6262"
+      }
+]

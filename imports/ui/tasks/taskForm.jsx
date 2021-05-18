@@ -6,6 +6,30 @@ import React, {
 import Select from 'react-select';
 import moment from 'moment';
 
+import {
+  Icon
+} from '@fluentui/react/lib/Icon';
+
+import {
+  statuses
+} from '../../other/constants';
+
+import {
+  selectStyle
+} from '../../other/styles/selectStyles';
+
+import {
+  Form,
+  FormTable,
+  Input,
+  Textarea,
+  TitleInput,
+  ButtonRow,
+  FullButton,
+  GroupButton,
+  LinkButton
+} from "../../other/styles/styledComponents";
+
 export default function TaskForm( props ) {
 
   const {
@@ -27,7 +51,7 @@ export default function TaskForm( props ) {
 
   const [ title, setTitle ] = useState( "" );
   const [ description, setDescription ] = useState( "" );
-  const [ status, setStatus ] = useState( "" );
+  const [ status, setStatus ] = useState( {} );
   const [ assigned, setAssigned ] = useState( [] );
   const [ tag, setTag ] = useState( null );
 
@@ -38,7 +62,6 @@ export default function TaskForm( props ) {
   const [ materials, setMaterials ] = useState( [] );
   const [ newMaterial, setNewMaterial ] = useState( null );
   const [ addingMaterial, setAddingMaterial ] = useState( false );
-
 
   const [ deadlines, setDeadlines ] = useState( [] );
   const [ newDeadline, setNewDeadline ] = useState( null );
@@ -56,9 +79,9 @@ export default function TaskForm( props ) {
       setDescription( "" );
     }
     if ( taskStatus ) {
-      setStatus( taskStatus );
+      setStatus( statuses.find( s => s.value === taskStatus ) );
     } else {
-      setStatus( "Open" );
+      setStatus( statuses[ 0 ] );
     }
     if ( taskAssigned ) {
       setAssigned( createReactSelectValue( taskAssigned.map( user => ( {
@@ -113,30 +136,23 @@ export default function TaskForm( props ) {
   const allTags = useMemo( () => createReactSelectValue( tags ), [ tags ] );
 
   return (
-    <div>
+    <Form>
 
       <section>
-        <label htmlFor="title">Title</label>
-        <input id="title" name="title" value={title} onChange={(e) => setTitle(e.target.value)} />
+        <TitleInput id="title" placeholder="NEW TASK" name="title" value={title} onChange={(e) => setTitle(e.target.value)} />
       </section>
+
+      <hr/>
 
       <section>
         <label  htmlFor="status">Status</label>
-        <select id="status" name="status" value={status} onChange={(e) => setStatus(e.target.value)}>
-          <option value="Open">Open</option>
-          <option value="Pending">Pending</option>
-          <option value="Closed">Closed</option>
-        </select>
-      </section>
-
-      <section>
-        <label htmlFor="description">Description</label>
-        <input id="description" name="description"  value={description} onChange={(e) => {e.preventDefault(); setDescription(e.target.value)}} />
+        {statuses.map(s => <GroupButton colour={s.value === status.value ? s.colour : null} onClick={(e) => {e.preventDefault(); setStatus(s);}}>{s.label}</GroupButton>)}
       </section>
 
       <section>
         <label htmlFor="assigned">Assigned</label>
         <Select
+          styles={selectStyle}
           value={assigned}
           onChange={(e) => setAssigned(e)}
           isMulti
@@ -147,25 +163,31 @@ export default function TaskForm( props ) {
       <section>
         <label htmlFor="tag">Tag</label>
         <Select
+          styles={selectStyle}
           value={tag}
           onChange={(e) => setTag(e)}
           options={allTags}
           />
       </section>
 
-      <table style={{width: "100%"}}>
+      <section>
+        <label htmlFor="description">Description</label>
+      </section>
+      <Textarea width="100%" id="description" placeholder="Description" name="description"  value={description} onChange={(e) => {e.preventDefault(); setDescription(e.target.value)}} />
+
+      <FormTable>
         <thead>
           <tr>
             <th colSpan="2">Action</th>
             <th>Duration (h)</th>
-            <th></th>
+            <th width="10%"></th>
           </tr>
         </thead>
         <tbody>
           {actions.map(action =>
             <tr key={action._id}>
               <td>
-                <input
+                <Input
                   type="checkbox"
                   checked={action.checked}
                   onChange={(e) =>{
@@ -183,7 +205,8 @@ export default function TaskForm( props ) {
                   />
               </td>
               <td>
-                <input
+                <Input
+                  type="text"
                   value={action.title}
                   onChange={(e) =>{
                     const newActions = actions.map(a => {
@@ -200,7 +223,7 @@ export default function TaskForm( props ) {
                   />
               </td>
               <td>
-                <input
+                <Input
                   type="number"
                   value={action.duration}
                   onChange={(e) =>{
@@ -218,52 +241,57 @@ export default function TaskForm( props ) {
                   />
               </td>
               <td>
-                <button
+                <LinkButton
                   onClick={() => {setActions(actions.filter(a => a._id !== action._id)); setAddingAction(false);}}
                   >
-                  x
-                </button>
+                  <Icon  iconName="Cancel" />
+                </LinkButton>
               </td>
             </tr>
           )}
           {addingAction &&
             <tr key={"add"}>
               <td colSpan="2">
-                <input value={newAction?.title} onChange={(e) => setNewAction({...newAction, title: e.target.value})} />
+                <Input
+                  placeholder="New action"
+                  type="text"
+                  value={newAction?.title}
+                  onChange={(e) => setNewAction({...newAction, title: e.target.value})}
+                   />
               </td>
               <td>
-                <input type="number" value={newAction?.duration} onChange={(e) => setNewAction({...newAction, duration: e.target.value})} />
+                <Input placeholder="Add duration" type="number" value={newAction?.duration} onChange={(e) => setNewAction({...newAction, duration: e.target.value})} />
               </td>
               <td>
-                <button onClick={() => setAddingAction(false)}>x</button>
-                <button onClick={() => { setActions([...actions, {...newAction, checked: false, _id: Math.random().toString(36).substring(7) }]); setNewAction(null); setAddingAction(false);}}>+</button>
+                <LinkButton onClick={() => setAddingAction(false)}><Icon  iconName="Cancel" /></LinkButton>
+                <LinkButton onClick={() => { setActions([...actions, {...newAction, checked: false, _id: Math.random().toString(36).substring(7) }]); setNewAction(null); setAddingAction(false);}}><Icon  iconName="Add" /></LinkButton>
               </td>
             </tr>
           }
           {!addingAction &&
             <tr key={"addBtn"}>
               <td colSpan="4">
-                <button onClick={() => setAddingAction(true)}>+ Action</button>
+                <LinkButton onClick={() => setAddingAction(true)}><Icon  iconName="Add" /> Action</LinkButton>
               </td>
             </tr>
           }
         </tbody>
-      </table>
+      </FormTable>
 
-      <table style={{width: "100%"}}>
+      <FormTable>
         <thead>
           <tr>
             <th colSpan="2">Materials</th>
             <th>Amount</th>
             <th>Price</th>
-            <th></th>
+            <th width="10%"></th>
           </tr>
         </thead>
         <tbody>
           {materials.map(material =>
             <tr key={material._id}>
               <td>
-                <input
+                <Input
                   type="checkbox"
                   checked={material.checked}
                   onChange={(e) =>{
@@ -281,7 +309,8 @@ export default function TaskForm( props ) {
                   />
               </td>
               <td>
-                <input
+                <Input
+                  type="text"
                   value={material.title}
                   onChange={(e) =>{
                     const newMaterials = materials.map(a => {
@@ -298,8 +327,7 @@ export default function TaskForm( props ) {
                   />
               </td>
               <td>
-                <input
-                  style={{width: "80px"}}
+                <Input
                   type="number"
                   value={material.amount}
                   onChange={(e) =>{
@@ -317,8 +345,7 @@ export default function TaskForm( props ) {
                   />
               </td>
               <td>
-                <input
-                  style={{width: "80px"}}
+                <Input
                   type="number"
                   value={material.price}
                   onChange={(e) =>{
@@ -336,54 +363,58 @@ export default function TaskForm( props ) {
                   />
               </td>
               <td>
-                <button
+                <LinkButton
                   onClick={() => {setMaterials(materials.filter(a => a._id !== material._id)); setAddingMaterial(false);}}
                   >
-                  x
-                </button>
+                  <Icon  iconName="Cancel" />
+                </LinkButton>
               </td>
             </tr>
           )}
           {addingMaterial &&
             <tr key={"add"}>
               <td colSpan="2">
-                <input value={newMaterial?.title} onChange={(e) => setNewMaterial({...newMaterial, title: e.target.value})} />
+                <Input type="text" placeholder="New material" value={newMaterial?.title} onChange={(e) => setNewMaterial({...newMaterial, title: e.target.value})} />
               </td>
               <td>
-                <input style={{width: "80px"}} type="number" value={newMaterial?.amount} onChange={(e) => setNewMaterial({...newMaterial, amount: e.target.value})} />
+                <Input type="number" placeholder="Add amount" value={newMaterial?.amount} onChange={(e) => setNewMaterial({...newMaterial, amount: e.target.value})} />
               </td>
               <td>
-                <input style={{width: "80px"}} type="number" value={newMaterial?.price} onChange={(e) => setNewMaterial({...newMaterial, price: e.target.value})} />
+                <Input type="number" placeholder="Add price" value={newMaterial?.price} onChange={(e) => setNewMaterial({...newMaterial, price: e.target.value})} />
               </td>
               <td>
-                <button onClick={() => setAddingMaterial(false)}>x</button>
-                <button onClick={() => { setMaterials([...materials, {...newMaterial, checked: false, _id: Math.random().toString(36).substring(7) }]); setNewMaterial(null); setAddingMaterial(false);}}>+</button>
+                <LinkButton onClick={() => setAddingMaterial(false)}>
+                <Icon  iconName="Cancel" />
+              </LinkButton>
+                <LinkButton onClick={() => { setMaterials([...materials, {...newMaterial, checked: false, _id: Math.random().toString(36).substring(7) }]); setNewMaterial(null); setAddingMaterial(false);}}>
+                <Icon  iconName="Add" />
+              </LinkButton>
               </td>
             </tr>
           }
           {!addingMaterial &&
             <tr key={"addBtn"}>
               <td colSpan="4">
-                <button onClick={() => setAddingMaterial(true)}>+ Material</button>
+                <LinkButton onClick={() => setAddingMaterial(true)}><Icon  iconName="Add" /> Material</LinkButton>
               </td>
             </tr>
           }
         </tbody>
-      </table>
+      </FormTable>
 
-      <table style={{width: "100%"}}>
+      <FormTable>
         <thead>
           <tr>
             <th colSpan="2">Deadlines</th>
             <th></th>
-            <th></th>
+            <th width="10%"></th>
           </tr>
         </thead>
         <tbody>
           {deadlines.map(deadline =>
             <tr key={deadline._id}>
-              <td>
-                <input
+              <td width="30px">
+                <Input
                   type="checkbox"
                   checked={deadline.checked}
                   onChange={(e) =>{
@@ -401,7 +432,7 @@ export default function TaskForm( props ) {
                   />
               </td>
               <td>
-                <input
+                <Input
                   type="datetime-local"
                   value={moment.unix(deadline.startDate).add((new Date).getTimezoneOffset(), 'minutes').format("yyyy-MM-DD hh:mm").replace(" ", "T")}
                   onChange={(e) =>{
@@ -419,7 +450,7 @@ export default function TaskForm( props ) {
                   />
               </td>
               <td>
-                <input
+                <Input
                   type="datetime-local"
                   value={moment.unix(deadline.endDate).add((new Date).getTimezoneOffset(), 'minutes').format("yyyy-MM-DD hh:mm").replace(" ", "T")}
                   onChange={(e) =>{
@@ -437,69 +468,78 @@ export default function TaskForm( props ) {
                   />
               </td>
               <td>
-                <button
+                <LinkButton
                   onClick={() => {setDeadlines(deadlines.filter(a => a._id !== deadline._id)); setAddingDeadline(false);}}
                   >
-                  x
-                </button>
+                  <Icon  iconName="Cancel" />
+                </LinkButton>
               </td>
             </tr>
           )}
           {addingDeadline &&
             <tr key={"add"}>
               <td colSpan="2">
-                <input
+                <Input
                   type="datetime-local"
+                  placeholder="Start deadline"
                   value={moment.unix(newDeadline?.startDate).add((new Date).getTimezoneOffset(), 'minutes').format("yyyy-MM-DD hh:mm").replace(" ", "T")}
                   max={moment.unix(newDeadline?.endDate).add((new Date).getTimezoneOffset(), 'minutes').format("yyyy-MM-DD hh:mm").replace(" ", "T")}
                   onChange={(e) => setNewDeadline({...newDeadline, startDate: e.target.valueAsNumber/1000})}
                   />
               </td>
               <td>
-                <input
+                <Input
                   type="datetime-local"
+                  placeholder="End deadline"
                   value={moment.unix(newDeadline?.endDate).add((new Date).getTimezoneOffset(), 'minutes').format("yyyy-MM-DD hh:mm").replace(" ", "T")}
                   min={moment.unix(newDeadline?.startDate).add((new Date).getTimezoneOffset(), 'minutes').format("yyyy-MM-DD hh:mm").replace(" ", "T")}
                   onChange={(e) => setNewDeadline({...newDeadline, endDate: e.target.valueAsNumber/1000})}
                   />
               </td>
               <td>
-                <button onClick={() => {setAddingDeadline(false); setNewDeadline(null);}}>x</button>
-                <button onClick={() => { setDeadlines([...deadlines, {...newDeadline, checked: false, _id: Math.random().toString(36).substring(7) }]); setNewDeadline(null); setAddingDeadline(false);}}>+</button>
+                <LinkButton onClick={() => {setAddingDeadline(false); setNewDeadline(null);}}>
+                  <Icon  iconName="Cancel" />
+                </LinkButton>
+                <LinkButton onClick={() => { setDeadlines([...deadlines, {...newDeadline, checked: false, _id: Math.random().toString(36).substring(7) }]); setNewDeadline(null); setAddingDeadline(false);}}>
+                <Icon  iconName="Add" />
+              </LinkButton>
               </td>
             </tr>
           }
           {!addingDeadline &&
             <tr key={"addBtn"}>
               <td colSpan="4">
-                <button onClick={() => setAddingDeadline(true)}>+ Deadline</button>
+                <LinkButton onClick={() => setAddingDeadline(true)}><Icon  iconName="Add" /> Deadline</LinkButton>
               </td>
             </tr>
           }
         </tbody>
-      </table>
+      </FormTable>
 
-      <button onClick={onCancel}>Cancel</button>
-      {onRemove &&
-        <button onClick={() => {onRemove(taskId); onCancel();}}>Delete</button>
-      }
-      <button
-        disabled={title.length === 0}
-        onClick={() => onSubmit(
-          title,
-          description,
-          status,
-          assigned.map(user => user._id),
-          tag?._id,
-          actions,
-          materials,
-          deadlines
-        )}
-        >
-        Save
-      </button>
+      <ButtonRow>
+        <FullButton colour="grey" onClick={(e) => {e.preventDefault(); onCancel()}}>Cancel</FullButton>
+        {onRemove &&
+          <FullButton colour="red" onClick={(e) => {e.preventDefault(); onRemove(taskId); onCancel();}}>Delete</FullButton>
+        }
+        <FullButton
+          colour=""
+          disabled={title.length === 0}
+          onClick={(e) => {e.preventDefault(); onSubmit(
+            title,
+            description,
+            status.value,
+            assigned.map(user => user._id),
+            tag?._id,
+            actions,
+            materials,
+            deadlines
+          );}}
+          >
+          Save
+        </FullButton>
+      </ButtonRow>
 
-    </div>
+    </Form>
   );
 };
 
