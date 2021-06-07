@@ -31,6 +31,7 @@ import EditTagContainer from './tags/editTagContainer';
 
 import {
   WHOLE_TABLE,
+  MY_TASKS,
   WITH_ACTIONS,
   WITH_MATERIALS
 } from '../other/constants';
@@ -75,21 +76,21 @@ export default function Sidebar( props ) {
   return (
     <StyledSidebar>
       <ul>
-        <SidebarLink key="whole" active={listType === WHOLE_TABLE}>
-          <Link to={`/tasks/${tagID}/all`}><Icon iconName="TriangleSolidRight12"/> Whole table</Link>
+        <SidebarLink key="allTasks" active={listType === WHOLE_TABLE}>
+          <Link to={`/tasks/${tagID}/all`}><Icon iconName="TaskLogo"/> All tasks</Link>
         </SidebarLink>
-        <SidebarLink key="actions" active={listType === WITH_ACTIONS}>
-          <Link to={`/tasks/${tagID}/actions`}><Icon iconName="TriangleSolidRight12"/> Actions</Link>
+        <SidebarLink key="myTasks" active={listType === MY_TASKS}>
+          <Link to={`/tasks/${tagID}/my-tasks`}><Icon iconName="TaskLogo"/> My Tasks</Link>
         </SidebarLink>
         <SidebarLink key="materials" active={listType === WITH_MATERIALS}>
-          <Link to={`/tasks/${tagID}/materials`}><Icon iconName="ShoppingCartSolid"/> Materials</Link>
+          <Link to={`/tasks/${tagID}/materials`}><Icon iconName="ShoppingCart"/> Materials</Link>
         </SidebarLink>
-        <SidebarLink key="all" active={tagID === "all"}>
-          <Link to="/tasks"><Icon iconName="FabricFolderFill"/> All tags</Link>
+        <SidebarLink key="allTags" active={tagID === "all"}>
+          <Link to="/tasks"><Icon iconName="FabricFolder"/> All tags</Link>
         </SidebarLink>
         {tags.map(tag => (
           <SidebarLink key={tag._id} active={tagID === tag._id}>
-            <Link to={`/tasks/${tag._id}${listType ? "/" + listType : ""}`}><Icon iconName="FabricFolderFill"/> {tag.title}</Link>
+            <Link to={`/tasks/${tag._id}${listType ? "/" + listType : ""}`}><Icon iconName="FabricFolder"/> {tag.title}</Link>
             <Icon iconName="Settings" onClick={() => setChosenTag(tag)} />
           </SidebarLink>
         ))}

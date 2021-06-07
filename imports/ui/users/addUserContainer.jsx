@@ -4,10 +4,6 @@ import React, {
 } from 'react';
 
 import {
-  UsersCollection
-} from '/imports/api/usersCollection';
-
-import {
   Modal,
   ModalBody
 } from 'reactstrap';
@@ -28,8 +24,8 @@ export default function AddUserContainer( props ) {
 
   const toggleAddUserModal = () => showAddUserModal( !addUserModalOpen );
 
-  const addNewUser = ( name, surname, email, showMyTasks, password ) => {
-    Accounts.createUser( {
+  const addNewUser = ( name, surname, showMyTasks, email, password ) => {
+    Meteor.users.insert( {
       password,
       email,
       profile: {

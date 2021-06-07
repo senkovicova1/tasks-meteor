@@ -1,7 +1,8 @@
 import React, {
   useState,
   useMemo,
-  useEffect
+  useEffect,
+  useCallback,
 } from 'react';
 
 import moment from 'moment';
@@ -24,9 +25,11 @@ import EditTaskContainer from './editTaskContainer';
 
 import {
   WHOLE_TABLE,
+  MY_TASKS,
   WITH_ACTIONS,
   WITH_MATERIALS,
   columns,
+  statuses,
   ALL_COLUMNS,
   ACTIONS_COLUMNS,
   MATERIAL_COLUMNS
@@ -61,7 +64,7 @@ export default function TaskList( props ) {
         'profile.showMyTasks': 1
       }
     } )
-    .profile.showMyTasks );
+    .profile.showMyTasks ) ;
 
   const [ showMyTasks, setShowMyTasks ] = useState( false );
 
@@ -78,19 +81,34 @@ export default function TaskList( props ) {
 
   const [ displayColumns, setDisplayColumns ] = useState( [] );
   const [ listType, setListType ] = useState( null );
+  const [ chosenStatuses, setChosenStatuses ] = useState([]);
 
+  const handleShowMyTasksChange = useCallback(() => {
+    let currentUser = users.find(user => user._id === userId);
+    let data = {...currentUser.profile};
+    data.showMyTasks = !showMyTasks;
+
+    Meteor.users.update(userId, {
+      $set: {
+        profile: data
+      }
+    });
+    setShowMyTasks(!showMyTasks);
+  }, [showMyTasks, users]);
 
   useEffect( () => {
-    setShowMyTasks( showMy );
-  }, [
-    showMy
-  ] );
+    setShowMyTasks( match.params.listType === MY_TASKS || showMy );
+  }, [ showMy, match.params.listType] );
 
   useEffect( () => {
     const newListType = match.params.listType;
     if ( !newListType || newListType === WHOLE_TABLE ) {
       setDisplayColumns( ALL_COLUMNS );
       setListType( WHOLE_TABLE );
+    }
+    if ( !newListType || newListType === MY_TASKS ) {
+      setDisplayColumns( ALL_COLUMNS );
+      setListType( MY_TASKS );
     }
     if ( newListType === WITH_ACTIONS ) {
       setDisplayColumns( ACTIONS_COLUMNS );
@@ -112,7 +130,7 @@ export default function TaskList( props ) {
     } ) ), [ tasks, tags, users ] );
 
   const filteredByListTypeTasks = useMemo( () => {
-    if ( !listType || listType === WHOLE_TABLE ) {
+    if ( !listType || listType === WHOLE_TABLE || listType === MY_TASKS ) {
       return joinedTasks;
     }
     if ( listType === WITH_ACTIONS ) {
@@ -121,10 +139,47 @@ export default function TaskList( props ) {
     if ( listType === WITH_MATERIALS ) {
       return joinedTasks.filter( task => task.materials && task.materials.length > 0 );
     }
-  }, [ tasks, listType ] );
+  }, [ joinedTasks, listType ] );
 
-  const filteredTasks = useMemo( () =>
-    filteredByListTypeTasks.filter( task => task.title.toLowerCase()
+  const filteredByOwnerTasks = useMemo(() => {
+    if ( showMyTasks ) {
+      return filteredByListTypeTasks.filter( task => task.assigned.some( a => a._id === userId ) );
+    }
+    return filteredByListTypeTasks;
+  }, [filteredByListTypeTasks, showMyTasks]);
+
+  const filteredTasks = useMemo( () => {
+    return filteredByOwnerTasks.filter( task => task.title.toLowerCase().includes( searchTitle.toLowerCase() ) &&
+    task.status.toLowerCase().includes( searchStatus.toLowerCase() ) &&
+    task.description.toLowerCase().includes( searchDescription.toLowerCase() ) &&
+    ( searchActions.length === 0 ||
+      ( task.actions && task.actions.some( a => a.title.toLowerCase().includes( searchActions.toLowerCase() ) ) ) ) &&
+    ( searchDuration.length === 0 ||
+      ( task.actions && task.actions.some( a => ( a.duration + " hours" ).includes( searchDuration.toLowerCase() ) ) ) ) &&
+    ( searchMaterial.length === 0 ||
+      ( task.materials &&
+        task.materials.some( m => ( m.title + m.amount + ( m.amount ? "pcs" : "" ) + m.price + ( m.price ? "eur" : "" ) ).toLowerCase().includes( searchMaterial.toLowerCase() ) ) ) ) &&
+      ( searchAssigned.length === 0 ||
+        task.assigned.some( a => ( a.profile.name + a.profile.surname ).toLowerCase().includes( searchAssigned.toLowerCase() ) ) ) &&
+      ( searchDeadlines.length === 0 ||
+        ( task.deadlines &&
+          task.deadlines.some( d => ( moment.unix( d.startDate )
+            .add( ( new Date )
+              .getTimezoneOffset(), 'minutes' )
+            .format( "DD.MM.yyyy hh:mm" ) + ( d.endDate ? " - " + moment.unix( d.endDate )
+              .add( ( new Date )
+                .getTimezoneOffset(), 'minutes' )
+              .format( "DD.MM.yyyy hh:mm" ) : "" ) )
+          .toLowerCase()
+          .includes( searchDeadlines.toLowerCase() ) ) ) ) )
+  }, [ filteredByOwnerTasks, searchTitle, searchStatus, searchDescription, searchActions, searchDuration, searchMaterial, searchAssigned, searchDeadlines, showMyTasks ] );
+
+  const filteredByStatusCheckboxes = useMemo(() => {
+    return filteredTasks.filter(task => chosenStatuses.length === 0 || chosenStatuses.length === statuses.length || chosenStatuses.includes(task.status));
+  }, [filteredTasks, chosenStatuses])
+
+  const globalFilteredTasks = useMemo( () => {
+    return filteredByStatusCheckboxes.filter( task => task.title.toLowerCase()
       .includes( search.toLowerCase() ) || task.status.toLowerCase()
       .includes( search.toLowerCase() ) || task.description.toLowerCase()
       .includes( search.toLowerCase() ) || ( task.actions && task.actions.some( a => ( a.title + a.duration + " hours" )
@@ -142,44 +197,209 @@ export default function TaskList( props ) {
             .format( "DD.MM.yyyy hh:mm" ) : "" ) )
         .toLowerCase()
         .includes( search.toLowerCase() ) ) ) )
-    .filter( task => task.title.toLowerCase()
-      .includes( searchTitle.toLowerCase() ) && task.status.toLowerCase()
-      .includes( searchStatus.toLowerCase() ) && task.description.toLowerCase()
-      .includes( searchDescription.toLowerCase() ) && ( searchActions.length === 0 || ( task.actions && task.actions.some( a => a.title.toLowerCase()
-        .includes( searchActions.toLowerCase() ) ) ) ) && ( searchDuration.length === 0 || ( task.actions && task.actions.some( a => ( a.duration + " hours" )
-        .includes( searchDuration.toLowerCase() ) ) ) ) && ( searchMaterial.length === 0 || ( task.materials && task.materials.some( m => ( m.title + m.amount + ( m.amount ? "pcs" : "" ) + m.price + ( m.price ? "eur" : "" ) )
-        .toLowerCase()
-        .includes( searchMaterial.toLowerCase() ) ) ) ) && ( searchAssigned.length === 0 || task.assigned.some( a => ( a.profile.name + a.profile.surname )
-        .toLowerCase()
-        .includes( searchAssigned.toLowerCase() ) ) ) && ( searchDeadlines.length === 0 || ( task.deadlines && task.deadlines.some( d => ( moment.unix( d.startDate )
-          .add( ( new Date )
-            .getTimezoneOffset(), 'minutes' )
-          .format( "DD.MM.yyyy hh:mm" ) + ( d.endDate ? " - " + moment.unix( d.endDate )
-            .add( ( new Date )
-              .getTimezoneOffset(), 'minutes' )
-            .format( "DD.MM.yyyy hh:mm" ) : "" ) )
-        .toLowerCase()
-        .includes( searchDeadlines.toLowerCase() ) ) ) ) )
-    .filter( task => !showMyTasks || task.assigned.some( a => a._id === userId ) ), [ tasks, search ] );
+  }, [ filteredByStatusCheckboxes, search ] )
 
+  const colouredTasks = useMemo( () => {
+      return globalFilteredTasks.map( ( task ) => {
+        let newTask = {
+          originalTask: task,
+        };
 
+        // TITLE
+        if ( search.length > 0 && task.title.toLowerCase()
+          .includes( search.toLowerCase() ) ) {
+          let startIndex = task.title.toLowerCase()
+            .indexOf( search.toLowerCase() );
+          let endIndex = startIndex + search.length;
+          newTask.title = <span> {task.title.substring( 0, startIndex - 1 )} <span style={{ backgroundColor: "yellow" }}> {task.title.substring( startIndex, endIndex )} </span> {task.title.substring(endIndex )} </span>;
+        } else {
+          newTask.title = task.title;
+        }
+
+        // STATUS
+        if ( search.length > 0 && task.status.toLowerCase()
+          .includes( search.toLowerCase() ) ) {
+          let startIndex = task.status.toLowerCase()
+            .indexOf( search.toLowerCase() );
+          let endIndex = startIndex + search.length;
+          newTask.status = <span> {task.status.substring( 0, startIndex - 1 )} <span style={{ backgroundColor: "yellow" }}> {task.status.substring( startIndex, endIndex )} </span> {task.status.substring(endIndex )} </span>;
+        } else {
+          newTask.status = task.status;
+        }
+
+        // DESCRIPTION
+        if ( search.length > 0 && task.description.toLowerCase()
+          .includes( search.toLowerCase() ) ) {
+          let startIndex = task.description.toLowerCase()
+            .indexOf( search.toLowerCase() );
+          let endIndex = startIndex + search.length;
+          newTask.description = <span> {task.description.substring( 0, startIndex - 1 )} <span style={{ backgroundColor: "yellow" }}> {task.description.substring( startIndex, endIndex )} </span> {task.description.substring(endIndex )} </span>;
+        } else {
+          newTask.description = task.description;
+        }
+
+        // ASSIGNED
+        newTask.assigned = task.assigned.map( assigned => {
+          let fullName = `${assigned.profile.name} ${assigned.profile.surname}`;
+          let startIndex = fullName.toLowerCase()
+            .indexOf( search.toLowerCase() );
+          let endIndex = startIndex + search.length;
+
+          let body = fullName;
+          if ( search.length > 0 && startIndex > -1 ) {
+            body = ( <span> {fullName.substring( 0, startIndex )} <span style={{ backgroundColor: "yellow"}}> {fullName.substring( startIndex, endIndex )} </span> {fullName.substring(endIndex )} </span> );
+          }
+          return ( <span style={{display: "block"}} key={assigned._id}>{body}</span> )
+        } );
+
+        // DEADLINES
+        newTask.deadlines = task.deadlines.map( deadline => {
+          let date = `${moment.unix(deadline.startDate).add((new Date).getTimezoneOffset(), 'minutes').format("DD.MM.yyyy hh:mm")} ${deadline.endDate ? " - " + moment.unix(deadline.endDate).add((new Date).getTimezoneOffset(), 'minutes').format("DD.MM.yyyy hh:mm") : ""}`;
+
+          let startIndex = date.toLowerCase()
+            .indexOf( search.toLowerCase() );
+          let endIndex = startIndex + search.length;
+
+          let body = date;
+          if ( search.length > 0 && startIndex > -1 ) {
+            body = ( <span> {date.substring( 0, startIndex )} <span style={{ backgroundColor: "yellow"}}> {date.substring( startIndex, endIndex )} </span> {date.substring(endIndex )} </span> );
+          }
+          return ( <span style={{display: "block"}} key={deadline._id}>{body}</span> )
+        } );
+
+        // ACTIONS
+        newTask.actions = task.actions.map( ( action, index ) => {
+          let startIndex = action.title.toLowerCase()
+            .indexOf( search.toLowerCase() );
+          let endIndex = startIndex + search.length;
+
+          let body = action.title;
+          if ( search.length > 0 && startIndex > -1 ) {
+            body = ( <span> { action.title.substring( 0, startIndex )} <span style={{ backgroundColor: "yellow"}}> { action.title.substring( startIndex, endIndex )} </span> { action.title.substring(endIndex )} </span> );
+          }
+          return ( <span style={{display: "block"}} key={action._id + "" +  index}>
+            <Input
+              type="checkbox"
+              style={{
+                marginRight: "0.2em"
+              }}
+              checked={action.checked}
+              readOnly
+              />
+            {body}
+          </span> )
+        } );
+
+        // DURATIONS
+        newTask.duration = task.actions.map( ( action, index ) => {
+          let data = action.duration && action.duration > 0 ? `${action.duration} hours` : "";
+          let startIndex = data.toLowerCase()
+            .indexOf( search.toLowerCase() );
+          let endIndex = startIndex + search.length;
+
+          let body = data;
+          if ( search.length > 0 && startIndex > -1 ) {
+            body = ( <span> { data.substring( 0, startIndex )} <span style={{ backgroundColor: "yellow"}}> { data.substring( startIndex, endIndex )} </span> {data.substring(endIndex )} </span> );
+          }
+          return ( <span style={{display: "block"}} key={action._id + "" +  index}>{body}</span> )
+        } );
+
+        // MATERIALS
+        newTask.material = task.materials.map( ( material, index ) => {
+          let data = `${material.title} ${material.amount ? material.amount + "pcs" : ""} ${material.price ? material.price + "eur" : ""}`;
+          let startIndex = data.toLowerCase()
+            .indexOf( search.toLowerCase() );
+          let endIndex = startIndex + search.length;
+
+          let body = data;
+          if ( search.length > 0 && startIndex > -1 ) {
+            body = ( <span> { data.substring( 0, startIndex )} <span style={{ backgroundColor: "yellow"}}> { data.substring( startIndex, endIndex )} </span> { data.substring(endIndex )} </span> );
+          }
+          return ( <span style={{display: "block"}} key={material._id + "" +  index}>
+            <Input
+              type="checkbox"
+              style={{
+                marginRight: "0.2em"
+              }}
+              checked={material.checked}
+              readOnly
+              />
+            {body}
+          </span> )
+        } );
+
+        return newTask;
+      } )
+    },
+    [ globalFilteredTasks ] );
 
   return (
     <List>
-      <h2>{(listType?.charAt(0).toUpperCase() + listType?.slice(1)).toString()}</h2>
+      <h2>{(listType?.charAt(0).toUpperCase() + listType?.slice(1)).toString() + (listType === WHOLE_TABLE ? " tasks" : "")}</h2>
       <SearchSection>
         <Input width="30%" placeholder="Search" value={search} onChange={(e) => setSearch(e.target.value)} />
         <AddTaskContainer users={users} tags={tags} />
+          <section>
+            <Input
+              id="allStatuses"
+              type="checkbox"
+              name="allStatuses"
+              style={{
+                marginRight: "0.2em"
+              }}
+              checked={chosenStatuses.length === 0 || chosenStatuses.length === statuses.length}
+              onChange={() => {
+                if (chosenStatuses.length === statuses.length){
+                  setChosenStatuses([]);
+                } else {
+                  setChosenStatuses(statuses.map(s => s.value));
+                }
+              }}
+              />
+            <label htmlFor="allStatuses">All</label>
+          </section>
+        {
+          statuses.map(status => (
+          <section>
+            <Input
+              id={status.value}
+              type="checkbox"
+              name={status.value}
+              style={{
+                marginRight: "0.2em",
+                marginLeft: "1em"
+              }}
+              checked={chosenStatuses.includes(status.value)}
+              onChange={() => {
+                let newChosenStatuses = [...chosenStatuses];
+                if (chosenStatuses.includes(status.value)){
+                   newChosenStatuses = newChosenStatuses.filter(s => s !== status.value);
+                } else {
+                  newChosenStatuses.push(status.value);
+                }
+                setChosenStatuses(newChosenStatuses);
+              }}
+              />
+            <label htmlFor={status.value}>{status.label}</label>
+          </section>
+        ))
+        }
+        {listType !== MY_TASKS &&
         <section>
-          <label htmlFor="showMyTasks">My tasks</label>
           <Input
             id="showMyTasks"
             type="checkbox"
             name="showMyTasks"
+            style={{
+              marginRight: "0.2em",
+              marginLeft: "1em"
+            }}
             checked={showMyTasks}
-            onChange={() =>  setShowMyTasks(!showMyTasks)}
+            onChange={handleShowMyTasksChange}
             />
+          <label htmlFor="showMyTasks">My tasks</label>
         </section>
+      }
       </SearchSection>
       <EditTaskContainer users={users} tags={tags} task={chosenTask} setChosenTask={setChosenTask}/>
       <table>
@@ -246,38 +466,9 @@ export default function TaskList( props ) {
             }
           </tr>
 
-          {filteredTasks.map(task =>
-            <tr key={task._id} onClick={() => setChosenTask(task)}>
-              {displayColumns.map(col => {
-                if (["status", "title", "description"].includes(col.value)){
-                  return (<td key={col.value}>{task[col.value]}</td>);
-                }
-                if (col.value === "actions"){
-                  return (<td key={col.value}>
-                    {task.actions?.map((action, index) =>
-                      <span style={{display: "block"}} key={action._id + "" +  index}>{`[${action.checked ? "x" : ""}] ${action.title}`}</span>
-                    )}
-                  </td>);
-                }
-                if (col.value === "duration"){
-                  return (<td key={col.value}>
-                    {task.actions?.map((action, index) =>
-                      <span style={{display: "block"}} key={action._id + "" + index}>{action.duration && action.duration > 0 ? `${action.duration} hours` : ""}</span>
-                    )}
-                  </td>);
-                }
-                if (col.value === "material"){
-                  return (<td key={col.value}>{task.materials?.map((material, index) =>
-                    <span style={{display: "block"}} key={material._id + "" +  index}>{`[${material.checked ? "x" : ""}] ${material.title} ${material.amount ? material.amount + "pcs" : ""} ${material.price ? material.price + "eur" : ""}`}</span>
-                  )}</td>);
-                }
-                if (col.value === "assigned"){
-                  return (<td key={col.value}>{task.assigned.map(assigned => <span style={{display: "block"}} key={assigned._id}>{`${assigned.profile.name} ${assigned.profile.surname} `}</span>)}</td>);
-                }
-                if (col.value === "deadlines") {
-                  return (<td key={col.value}>{task.deadlines?.map(deadline => <span style={{display: "block"}} key={deadline._id}>{`${moment.unix(deadline.startDate).add((new Date).getTimezoneOffset(), 'minutes').format("DD.MM.yyyy hh:mm")} ${deadline.endDate ? " - " + moment.unix(deadline.endDate).add((new Date).getTimezoneOffset(), 'minutes').format("DD.MM.yyyy hh:mm") : ""} `}</span>)}</td>);
-                }
-              })}
+          {colouredTasks.map(task =>
+            <tr key={task._id} onClick={() => setChosenTask(task.originalTask)}>
+              {displayColumns.map(col => (<td key={col.value}>{task[col.value]}</td>))}
             </tr>
           )}
         </tbody>

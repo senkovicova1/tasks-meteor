@@ -4,9 +4,6 @@ import React, {
   useEffect
 } from 'react';
 
-import {
-  UsersCollection
-} from '/imports/api/usersCollection';
 
 import {
   Modal,
@@ -33,7 +30,7 @@ export default function EditUserContainer( props ) {
     }
   }, [ user ] )
 
-  const editUser = ( name, surname, email, showMyTasks, password = "" ) => {
+  const editUser = ( name, surname, showMyTasks ) => {
     let data = {};
     if ( user.name !== name ) {
       data.name = name;
@@ -41,17 +38,16 @@ export default function EditUserContainer( props ) {
     if ( user.surname !== surname ) {
       data.surname = surname;
     }
-    if ( user.email !== email ) {
-      data.email = email;
-    }
     if ( user.showMyTasks !== showMyTasks ) {
       data.showMyTasks = showMyTasks;
     }
-    UsersCollection.update( user._id, {
+
+    Meteor.users.update(user._id, {
       $set: {
-        ...data
+        profile: data
       }
-    } )
+    });
+
     setChosenUser( null );
   };
 

@@ -18,9 +18,7 @@ export default function UserForm( props ) {
 
   const {
     _id: userId,
-    name: userName,
-    surname: userSurname,
-    email: userEmail,
+    profile,
     onSubmit,
     onRemove,
     onCancel,
@@ -34,22 +32,22 @@ export default function UserForm( props ) {
   const [ password2, setPassword2 ] = useState( '' );
 
   useEffect( () => {
-    if ( userName ) {
-      setName( userName );
+    if ( profile?.name ) {
+      setName( profile.name );
     } else {
       setName( "" );
     }
-    if ( userSurname ) {
-      setSurname( userSurname );
+    if ( profile?.surname ) {
+      setSurname( profile.surname );
     } else {
       setSurname( "" );
     }
-    if ( userEmail ) {
-      setEmail( userEmail );
+    if ( profile?.showMyTasks ) {
+      setShowMyTasks( profile.showMyTasks );
     } else {
-      setEmail( "" );
+      setShowMyTasks( false );
     }
-  }, [ userName, userSurname, userEmail ] );
+  }, [ profile ] );
 
 
   return (
@@ -77,6 +75,7 @@ export default function UserForm( props ) {
           />
       </section>
 
+{ !profile &&
       <section>
         <label  htmlFor="email">Email</label>
           <Input
@@ -86,6 +85,7 @@ export default function UserForm( props ) {
               onChange={(e) => setEmail(e.target.value)}
           />
       </section>
+    }
 
       <section>
         <Input
@@ -98,6 +98,7 @@ export default function UserForm( props ) {
         <label htmlFor="showMyTasks">Show only my tasks by default</label>
       </section>
 
+{ !profile &&
 <section>
       <label htmlFor="password1">Password</label>
         <Input
@@ -108,7 +109,8 @@ export default function UserForm( props ) {
           onChange={e => setPassword1(e.target.value)}
         />
     </section>
-
+}
+{ !profile &&
         <section>
       <label htmlFor="password2">Repeat password</label>
               <Input
@@ -119,6 +121,7 @@ export default function UserForm( props ) {
                 onChange={e => setPassword2(e.target.value)}
               />
           </section>
+        }
 
 <ButtonRow>
           {onCancel &&
@@ -129,14 +132,14 @@ export default function UserForm( props ) {
       }
       <FullButton
         colour=""
-        disabled={name.length + surname.length + email.length === 0 || !isEmail(email) || password1 !== password2}
+        disabled={name.length + surname.length + email.length === 0 || (!profile && !isEmail(email)) || (!profile && password1 !== password2)}
         onClick={(e) => {
           e.preventDefault();
           onSubmit(
           name,
           surname,
-          email,
           showMyTasks,
+          email,
           password1
         );
       }}

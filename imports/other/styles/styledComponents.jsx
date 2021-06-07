@@ -9,6 +9,7 @@ const lightBlueColour = "#deeaf3";
 //numeric values
 const contentOffset = "10%";
 const sidebarWidth = "20%";
+const inputOffset = "7px";
 
 export const MainPage = styled.div `
   font-size: 1em;
@@ -26,6 +27,9 @@ export const MainPage = styled.div `
   ul {
     list-style-type: none;
     padding: 0px;
+  }
+  label {
+    margin: 0px;
   }
 `;
 
@@ -65,7 +69,7 @@ button:last-child{
 `;
 
 export const LinkButton = styled.button `
-  color: ${(props) => props.whiteFont ? "white" : basicBlueColour};
+  color: ${(props) => props.font ? props.font : basicBlueColour};
   padding: 0px;
   height: 1em;
   background-color: transparent !important;
@@ -176,16 +180,21 @@ display: flex;
 justify-content: flex-start;
 align-items: center;
 
-input {
+input, button {
   margin-right: 1em;
 }
 `;
 
 export const Form = styled.form `
-padding: 30px 40px;
+padding: 30px calc(40px - ${inputOffset});
 
 hr{
   margin: 0em 0em 1em 0em;
+}
+
+.useOffset {
+  margin-left: ${inputOffset};
+  margin-right: ${inputOffset};
 }
 
 section {
@@ -199,7 +208,7 @@ section {
     font-weight: 500;
     width: 15%;
   }
-  input, &>div {
+  input:not(#title), &>div {
     width: 85%;
   }
 
@@ -213,7 +222,7 @@ input[type=checkbox] + label{
 export const FormTable = styled.table `
   line-height: 2em;
   color: #333333;
-  width: 100%;
+  width: -webkit-fill-available;
   margin-bottom: 2em;
 
 input[type=text], input[type=number], input[type=datetime-local]{
@@ -245,9 +254,9 @@ input[type=text], input[type=number], input[type=datetime-local]{
 
     td:first-of-type{
       width: 2em;
+    }
   }
-  }
-  td:last-of-type{
+  tr:not(:last-of-type)>td:last-of-type{
     display: flex;
     justify-content: flex-start;
     align-items: center;
@@ -271,6 +280,7 @@ padding-left: 0.4em;
 &[type=checkbox]{
     height: 1.3em;
     width: 1.3em;
+    vertical-align: middle;
 }
 `;
 
@@ -291,7 +301,7 @@ export const TitleInput = styled( Input )
 background-color: transparent !important;
 outline: none !important;
 border: none !important;
-width: ${(props) => props.width ? props.width : "100%"};
+width: ${(props) => props.width ? props.width : "-webkit-fill-available"};
 height: 2em;
 font-size: 2em;
 font-weight: lighter;
@@ -303,7 +313,7 @@ export const GroupButton = styled.button `
   background-color: ${(props) => props.colour ? props.colour : "white"};
   color: ${(props) => props.colour ? "white" : basicBlueColour};
   outline: none !important;
-  border: 1px solid ${(props) => props.colour ? props.colour : basicBlueColour};
+  border: 1px solid ${basicBlueColour};
 
   border-radius: 0px;
 

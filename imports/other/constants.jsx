@@ -1,4 +1,5 @@
 export const WHOLE_TABLE = "all";
+export const MY_TASKS = "my-tasks";
 export const WITH_ACTIONS = 'actions';
 export const WITH_MATERIALS = 'materials';
 
@@ -61,7 +62,7 @@ export const columns = {
     label: "Assigned",
     value: "assigned",
     width: {
-      all: "10%",
+      all: "15%",
       actions: "",
       materials: "",
     }
@@ -70,7 +71,7 @@ export const columns = {
     label: "Deadlines",
     value: "deadlines",
     width: {
-      all: "20%",
+      all: "15%",
       actions: "",
       materials: "",
     }

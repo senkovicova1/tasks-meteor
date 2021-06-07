@@ -18,7 +18,7 @@ export default function Header( props ) {
   return (
     <PageHeader>
       <h1>LanTask</h1>
-      <LinkButton type="submit" whiteFont onClick={logout}><Icon  iconName="SignOut" /></LinkButton>
+      <LinkButton type="submit" font="white" onClick={logout}><Icon  iconName="SignOut" /></LinkButton>
     </PageHeader>
   );
 };

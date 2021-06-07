@@ -86,7 +86,7 @@ export default function TaskForm( props ) {
     if ( taskAssigned ) {
       setAssigned( createReactSelectValue( taskAssigned.map( user => ( {
         ...user,
-        fullName: user.name + " " + user.surname
+        fullName: user.profile.name + " " + user.profile.surname
       } ) ), "fullName" ) );
     } else {
       setAssigned( [] );
@@ -138,18 +138,21 @@ export default function TaskForm( props ) {
   return (
     <Form>
 
-      <section>
+      <section className="useOffset">
         <TitleInput id="title" placeholder="NEW TASK" name="title" value={title} onChange={(e) => setTitle(e.target.value)} />
+          {onRemove &&
+            <LinkButton font="red" onClick={(e) => {e.preventDefault(); onRemove(taskId); onCancel();}}><Icon iconName="Delete"/></LinkButton>
+          }
       </section>
 
       <hr/>
 
-      <section>
+      <section className="useOffset">
         <label  htmlFor="status">Status</label>
         {statuses.map(s => <GroupButton colour={s.value === status.value ? s.colour : null} onClick={(e) => {e.preventDefault(); setStatus(s);}}>{s.label}</GroupButton>)}
       </section>
 
-      <section>
+      <section className="useOffset">
         <label htmlFor="assigned">Assigned</label>
         <Select
           styles={selectStyle}
@@ -160,7 +163,7 @@ export default function TaskForm( props ) {
           />
       </section>
 
-      <section>
+      <section className="useOffset">
         <label htmlFor="tag">Tag</label>
         <Select
           styles={selectStyle}
@@ -170,12 +173,12 @@ export default function TaskForm( props ) {
           />
       </section>
 
-      <section>
+      <section className="useOffset">
         <label htmlFor="description">Description</label>
       </section>
       <Textarea width="100%" id="description" placeholder="Description" name="description"  value={description} onChange={(e) => {e.preventDefault(); setDescription(e.target.value)}} />
 
-      <FormTable>
+      <FormTable className="useOffset">
         <thead>
           <tr>
             <th colSpan="2">Action</th>
@@ -278,7 +281,7 @@ export default function TaskForm( props ) {
         </tbody>
       </FormTable>
 
-      <FormTable>
+      <FormTable className="useOffset">
         <thead>
           <tr>
             <th colSpan="2">Materials</th>
@@ -402,7 +405,7 @@ export default function TaskForm( props ) {
         </tbody>
       </FormTable>
 
-      <FormTable>
+      <FormTable className="useOffset">
         <thead>
           <tr>
             <th colSpan="2">Deadlines</th>
@@ -516,11 +519,8 @@ export default function TaskForm( props ) {
         </tbody>
       </FormTable>
 
-      <ButtonRow>
+      <ButtonRow className="useOffset">
         <FullButton colour="grey" onClick={(e) => {e.preventDefault(); onCancel()}}>Cancel</FullButton>
-        {onRemove &&
-          <FullButton colour="red" onClick={(e) => {e.preventDefault(); onRemove(taskId); onCancel();}}>Delete</FullButton>
-        }
         <FullButton
           colour=""
           disabled={title.length === 0}
@@ -542,5 +542,3 @@ export default function TaskForm( props ) {
     </Form>
   );
 };
-
-// console.log(e.target.valueAsNumber, moment.unix(e.target.valueAsNumber/1000).add((new Date).getTimezoneOffset(), 'minutes').format('DD.MM.YYYY HH:mm'))

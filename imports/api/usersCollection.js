@@ -2,4 +2,12 @@ import {
   Mongo
 } from 'meteor/mongo';
 
-//export const UsersCollection = new Mongo.Collection( 'users' );
+Meteor.users.allow( {
+  insert() {
+    return true;
+  },
+
+  update() {
+    return true;
+  },
+} );

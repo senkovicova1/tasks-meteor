@@ -42,7 +42,6 @@ export default function UserList( props ) {
            .includes( searchEmail.toLowerCase() ) */
     ), [ users, search ] );
 
-
   return (
     <List>
       <h2>Users</h2>
@@ -75,7 +74,7 @@ export default function UserList( props ) {
             <tr key={user._id} onClick={() => setChosenUser(user)}>
               <td>{user.profile.surname}</td>
               <td>{user.profile.name}</td>
-              <td>{/*user.emails[0].address*/}</td>
+              <td>{user.emails ? user.emails[0].address : "Cannot access email"}</td>
               </tr>
             )}
           </tbody>
