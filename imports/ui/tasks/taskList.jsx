@@ -206,10 +206,8 @@ export default function TaskList( props ) {
         };
 
         // TITLE
-        if ( search.length > 0 && task.title.toLowerCase()
-          .includes( search.toLowerCase() ) ) {
-          let startIndex = task.title.toLowerCase()
-            .indexOf( search.toLowerCase() );
+        if ( search.length > 0 && task.title.toLowerCase().includes( search.toLowerCase() ) ) {
+          let startIndex = task.title.toLowerCase().indexOf( search.toLowerCase() );
           let endIndex = startIndex + search.length;
           newTask.title = <span> {task.title.substring( 0, startIndex - 1 )} <span style={{ backgroundColor: "yellow" }}> {task.title.substring( startIndex, endIndex )} </span> {task.title.substring(endIndex )} </span>;
         } else {
@@ -264,7 +262,7 @@ export default function TaskList( props ) {
           if ( search.length > 0 && startIndex > -1 ) {
             body = ( <span> {date.substring( 0, startIndex )} <span style={{ backgroundColor: "yellow"}}> {date.substring( startIndex, endIndex )} </span> {date.substring(endIndex )} </span> );
           }
-          return ( <span style={{display: "block"}} key={deadline._id}>{body}</span> )
+          return ( <span key={date} style={{display: "block"}} key={deadline._id}>{body}</span> )
         } );
 
         // ACTIONS
@@ -277,7 +275,7 @@ export default function TaskList( props ) {
           if ( search.length > 0 && startIndex > -1 ) {
             body = ( <span> { action.title.substring( 0, startIndex )} <span style={{ backgroundColor: "yellow"}}> { action.title.substring( startIndex, endIndex )} </span> { action.title.substring(endIndex )} </span> );
           }
-          return ( <span style={{display: "block"}} key={action._id + "" +  index}>
+          return ( <span key={action._id} style={{display: "block"}} key={action._id + "" +  index}>
             <Input
               type="checkbox"
               style={{
@@ -301,7 +299,7 @@ export default function TaskList( props ) {
           if ( search.length > 0 && startIndex > -1 ) {
             body = ( <span> { data.substring( 0, startIndex )} <span style={{ backgroundColor: "yellow"}}> { data.substring( startIndex, endIndex )} </span> {data.substring(endIndex )} </span> );
           }
-          return ( <span style={{display: "block"}} key={action._id + "" +  index}>{body}</span> )
+          return ( <span key={action._id} style={{display: "block"}} key={action._id + "" +  index}>{body}</span> )
         } );
 
         // MATERIALS
@@ -315,7 +313,7 @@ export default function TaskList( props ) {
           if ( search.length > 0 && startIndex > -1 ) {
             body = ( <span> { data.substring( 0, startIndex )} <span style={{ backgroundColor: "yellow"}}> { data.substring( startIndex, endIndex )} </span> { data.substring(endIndex )} </span> );
           }
-          return ( <span style={{display: "block"}} key={material._id + "" +  index}>
+          return ( <span key={material._id} style={{display: "block"}} key={material._id + "" +  index}>
             <Input
               type="checkbox"
               style={{
@@ -339,7 +337,7 @@ export default function TaskList( props ) {
       <SearchSection>
         <Input width="30%" placeholder="Search" value={search} onChange={(e) => setSearch(e.target.value)} />
         <AddTaskContainer users={users} tags={tags} />
-          <section>
+          <section key="allStatuses">
             <Input
               id="allStatuses"
               type="checkbox"
@@ -360,7 +358,7 @@ export default function TaskList( props ) {
           </section>
         {
           statuses.map(status => (
-          <section>
+          <section key={status.value}>
             <Input
               id={status.value}
               type="checkbox"
@@ -385,7 +383,7 @@ export default function TaskList( props ) {
         ))
         }
         {listType !== MY_TASKS &&
-        <section>
+        <section key="showMyTasks">
           <Input
             id="showMyTasks"
             type="checkbox"
@@ -409,7 +407,7 @@ export default function TaskList( props ) {
           </tr>
         </thead>
         <tbody>
-          <tr>
+          <tr key="filters">
             {
               displayColumns.map(col => {
                 switch (col.value) {
