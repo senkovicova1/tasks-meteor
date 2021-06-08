@@ -34,7 +34,7 @@ export default function AddTaskContainer( props ) {
 
   const toggleAddTaskModal = () => showAddTaskModal( !addTaskModalOpen );
 
-  const addNewTask = ( title, description, status, assigned, tag, actions, materials, deadlines ) => {
+  const addNewTask = ( title, description, status, assigned, tag, actions, materials, deadline ) => {
     TasksCollection.insert( {
       title,
       description,
@@ -43,7 +43,7 @@ export default function AddTaskContainer( props ) {
       tag,
       actions,
       materials,
-      deadlines
+      deadline
     } );
     showAddTaskModal( false );
   }

@@ -69,7 +69,7 @@ export const columns = {
   },
   DEADLINES: {
     label: "Deadlines",
-    value: "deadlines",
+    value: "deadline",
     width: {
       all: "15%",
       actions: "",
@@ -78,8 +78,8 @@ export const columns = {
   },
 }
 
-export const ALL_COLUMNS = [ columns.STATUS, columns.TITLE, columns.DESCRIPTION, columns.ACTIONS, columns.DURATION, columns.DEADLINES, columns.MATERIAL, columns.ASSIGNED ];
-export const ACTIONS_COLUMNS = [ columns.STATUS, columns.TITLE, columns.DESCRIPTION, columns.ACTIONS, columns.DURATION, columns.DEADLINES, columns.MATERIAL, columns.ASSIGNED ];
+export const ALL_COLUMNS = [ columns.STATUS, columns.TITLE, columns.DESCRIPTION, columns.ASSIGNED, columns.DEADLINES, columns.ACTIONS, columns.DURATION, columns.MATERIAL ];
+export const ACTIONS_COLUMNS = [ columns.STATUS, columns.TITLE, columns.DESCRIPTION, columns.ASSIGNED, columns.DEADLINES, columns.ACTIONS, columns.DURATION, columns.MATERIAL ];
 export const MATERIAL_COLUMNS = [ columns.MATERIAL, columns.TITLE, columns.STATUS, columns.ASSIGNED ];
 
 export const statuses = [

@@ -41,7 +41,7 @@ export default function TaskForm( props ) {
     tag: taskTag,
     actions: taskActions,
     materials: taskMaterials,
-    deadlines: taskDeadlines,
+    deadline: taskDeadline,
     users,
     tags,
     onSubmit,
@@ -54,6 +54,7 @@ export default function TaskForm( props ) {
   const [ status, setStatus ] = useState( {} );
   const [ assigned, setAssigned ] = useState( [] );
   const [ tag, setTag ] = useState( null );
+  const [ deadline, setDeadline ] = useState( null );
 
   const [ actions, setActions ] = useState( [] );
   const [ newAction, setNewAction ] = useState( null );
@@ -63,9 +64,6 @@ export default function TaskForm( props ) {
   const [ newMaterial, setNewMaterial ] = useState( null );
   const [ addingMaterial, setAddingMaterial ] = useState( false );
 
-  const [ deadlines, setDeadlines ] = useState( [] );
-  const [ newDeadline, setNewDeadline ] = useState( null );
-  const [ addingDeadline, setAddingDeadline ] = useState( false );
 
   useEffect( () => {
     if ( taskTitle ) {
@@ -110,12 +108,12 @@ export default function TaskForm( props ) {
     } else {
       setMaterials( [] );
     }
-    if ( taskDeadlines ) {
-      setDeadlines( taskDeadlines );
+    if ( taskDeadline ) {
+      setDeadline( taskDeadline );
     } else {
-      setDeadlines( [] );
+      setDeadline( null );
     }
-  }, [ taskTitle, taskDescription, taskStatus, taskAssigned, taskTag, taskActions, taskMaterials, taskDeadlines ] )
+  }, [ taskTitle, taskDescription, taskStatus, taskAssigned, taskTag, taskActions, taskMaterials, taskDeadline ] )
 
 
   const createReactSelectValue = ( array, label = "title", value = "_id" ) => {
@@ -170,6 +168,17 @@ export default function TaskForm( props ) {
           value={tag}
           onChange={(e) => setTag(e)}
           options={allTags}
+          />
+      </section>
+
+      <section className="useOffset">
+        <label htmlFor="deadline">Deadline</label>
+        <Input
+          type="datetime-local"
+          placeholder="Deadline"
+          value={deadline ? moment.unix(deadline).add((new Date).getTimezoneOffset(), 'minutes').format("yyyy-MM-DD hh:mm").replace(" ", "T") : ""}
+          min={moment.unix().add((new Date).getTimezoneOffset(), 'minutes').format("yyyy-MM-DD hh:mm").replace(" ", "T")}
+          onChange={(e) => setDeadline(e.target.valueAsNumber/1000)}
           />
       </section>
 
@@ -335,7 +344,7 @@ export default function TaskForm( props ) {
                   value={material.amount}
                   onChange={(e) =>{
                     const newMaterials = materials.map(a => {
-                      if (a._id === materials._id){
+                      if (a._id === material._id){
                         return {
                           ...a,
                           amount: e.target.value
@@ -405,120 +414,6 @@ export default function TaskForm( props ) {
         </tbody>
       </FormTable>
 
-      <FormTable className="useOffset">
-        <thead>
-          <tr>
-            <th colSpan="2">Deadlines</th>
-            <th></th>
-            <th width="10%"></th>
-          </tr>
-        </thead>
-        <tbody>
-          {deadlines.map(deadline =>
-            <tr key={deadline._id}>
-              <td width="30px">
-                <Input
-                  type="checkbox"
-                  checked={deadline.checked}
-                  onChange={(e) =>{
-                    const newDeadline = deadlines.map(a => {
-                      if (a._id === deadline._id){
-                        return {
-                          ...a,
-                          checked: !deadline.checked
-                        };
-                      }
-                      return a;
-                    });
-                    setDeadlines(newDeadline);
-                  }}
-                  />
-              </td>
-              <td>
-                <Input
-                  type="datetime-local"
-                  value={moment.unix(deadline.startDate).add((new Date).getTimezoneOffset(), 'minutes').format("yyyy-MM-DD hh:mm").replace(" ", "T")}
-                  onChange={(e) =>{
-                    const newDeadline = deadlines.map(a => {
-                      if (a._id === deadline._id){
-                        return {
-                          ...a,
-                          startDate: e.target.valueAsNumber/1000
-                        };
-                      }
-                      return a;
-                    });
-                    setDeadlines(newDeadlines);
-                  }}
-                  />
-              </td>
-              <td>
-                <Input
-                  type="datetime-local"
-                  value={moment.unix(deadline.endDate).add((new Date).getTimezoneOffset(), 'minutes').format("yyyy-MM-DD hh:mm").replace(" ", "T")}
-                  onChange={(e) =>{
-                    const newDeadlines = deadlines.map(a => {
-                      if (a._id === deadline._id){
-                        return {
-                          ...a,
-                          endDate: e.target.valueAsNumber/1000
-                        };
-                      }
-                      return a;
-                    });
-                    setDeadlines(newDeadlines);
-                  }}
-                  />
-              </td>
-              <td>
-                <LinkButton
-                  onClick={() => {setDeadlines(deadlines.filter(a => a._id !== deadline._id)); setAddingDeadline(false);}}
-                  >
-                  <Icon  iconName="Cancel" />
-                </LinkButton>
-              </td>
-            </tr>
-          )}
-          {addingDeadline &&
-            <tr key={"add"}>
-              <td colSpan="2">
-                <Input
-                  type="datetime-local"
-                  placeholder="Start deadline"
-                  value={moment.unix(newDeadline?.startDate).add((new Date).getTimezoneOffset(), 'minutes').format("yyyy-MM-DD hh:mm").replace(" ", "T")}
-                  max={moment.unix(newDeadline?.endDate).add((new Date).getTimezoneOffset(), 'minutes').format("yyyy-MM-DD hh:mm").replace(" ", "T")}
-                  onChange={(e) => setNewDeadline({...newDeadline, startDate: e.target.valueAsNumber/1000})}
-                  />
-              </td>
-              <td>
-                <Input
-                  type="datetime-local"
-                  placeholder="End deadline"
-                  value={moment.unix(newDeadline?.endDate).add((new Date).getTimezoneOffset(), 'minutes').format("yyyy-MM-DD hh:mm").replace(" ", "T")}
-                  min={moment.unix(newDeadline?.startDate).add((new Date).getTimezoneOffset(), 'minutes').format("yyyy-MM-DD hh:mm").replace(" ", "T")}
-                  onChange={(e) => setNewDeadline({...newDeadline, endDate: e.target.valueAsNumber/1000})}
-                  />
-              </td>
-              <td>
-                <LinkButton onClick={() => {setAddingDeadline(false); setNewDeadline(null);}}>
-                  <Icon  iconName="Cancel" />
-                </LinkButton>
-                <LinkButton onClick={() => { setDeadlines([...deadlines, {...newDeadline, checked: false, _id: Math.random().toString(36).substring(7) }]); setNewDeadline(null); setAddingDeadline(false);}}>
-                <Icon  iconName="Add" />
-              </LinkButton>
-              </td>
-            </tr>
-          }
-          {!addingDeadline &&
-            <tr key={"addBtn"}>
-              <td colSpan="4">
-                <LinkButton onClick={() => setAddingDeadline(true)}><Icon  iconName="Add" /> Deadline</LinkButton>
-              </td>
-            </tr>
-          }
-        </tbody>
-      </FormTable>
-
       <ButtonRow className="useOffset">
         <FullButton colour="grey" onClick={(e) => {e.preventDefault(); onCancel()}}>Cancel</FullButton>
         <FullButton
@@ -532,7 +427,7 @@ export default function TaskForm( props ) {
             tag?._id,
             actions,
             materials,
-            deadlines
+            deadline
           );}}
           >
           Save

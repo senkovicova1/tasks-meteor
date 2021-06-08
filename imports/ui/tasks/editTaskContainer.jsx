@@ -35,7 +35,7 @@ export default function EditTaskContainer( props ) {
     }
   }, [ task ] )
 
-  const editTask = ( title, description, status, assigned, tag, actions, materials, deadlines ) => {
+  const editTask = ( title, description, status, assigned, tag, actions, materials, deadline ) => {
     let data = {};
     if ( task.title !== title ) {
       data.title = title;
@@ -54,7 +54,7 @@ export default function EditTaskContainer( props ) {
     }
     data.actions = actions;
     data.materials = materials;
-    data.deadlines = deadlines;
+    data.deadline = deadline;
     TasksCollection.update( task._id, {
       $set: {
         ...data

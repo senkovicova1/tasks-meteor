@@ -76,7 +76,7 @@ export default function TaskList( props ) {
   const [ searchDuration, setSearchDuration ] = useState( "" );
   const [ searchMaterial, setSearchMaterial ] = useState( "" );
   const [ searchAssigned, setSearchAssigned ] = useState( "" );
-  const [ searchDeadlines, setSearchDeadlines ] = useState( "" );
+  const [ searchDeadline, setSearchDeadline ] = useState( "" );
   const [ chosenTask, setChosenTask ] = useState( null );
 
   const [ displayColumns, setDisplayColumns ] = useState( [] );
@@ -161,18 +161,9 @@ export default function TaskList( props ) {
         task.materials.some( m => ( m.title + m.amount + ( m.amount ? "pcs" : "" ) + m.price + ( m.price ? "eur" : "" ) ).toLowerCase().includes( searchMaterial.toLowerCase() ) ) ) ) &&
       ( searchAssigned.length === 0 ||
         task.assigned.some( a => ( a.profile.name + a.profile.surname ).toLowerCase().includes( searchAssigned.toLowerCase() ) ) ) &&
-      ( searchDeadlines.length === 0 ||
-        ( task.deadlines &&
-          task.deadlines.some( d => ( moment.unix( d.startDate )
-            .add( ( new Date )
-              .getTimezoneOffset(), 'minutes' )
-            .format( "DD.MM.yyyy hh:mm" ) + ( d.endDate ? " - " + moment.unix( d.endDate )
-              .add( ( new Date )
-                .getTimezoneOffset(), 'minutes' )
-              .format( "DD.MM.yyyy hh:mm" ) : "" ) )
-          .toLowerCase()
-          .includes( searchDeadlines.toLowerCase() ) ) ) ) )
-  }, [ filteredByOwnerTasks, searchTitle, searchStatus, searchDescription, searchActions, searchDuration, searchMaterial, searchAssigned, searchDeadlines, showMyTasks ] );
+        moment.unix( task.deadline ).add( ( new Date ).getTimezoneOffset(), 'minutes' ).format( "DD.MM.yyyy hh:mm" ).includes( searchStatus.toLowerCase() )
+      )
+  }, [ filteredByOwnerTasks, searchTitle, searchStatus, searchDescription, searchActions, searchDuration, searchMaterial, searchAssigned, searchDeadline, showMyTasks ] );
 
   const filteredByStatusCheckboxes = useMemo(() => {
     return filteredTasks.filter(task => chosenStatuses.length === 0 || chosenStatuses.length === statuses.length || chosenStatuses.includes(task.status));
@@ -188,15 +179,7 @@ export default function TaskList( props ) {
         .toLowerCase()
         .includes( search.toLowerCase() ) ) ) || ( task.assigned.some( a => ( a.profile.name + a.profile.surname )
         .toLowerCase()
-        .includes( search.toLowerCase() ) ) ) || ( task.deadlines && task.deadlines.some( d => ( moment.unix( d.startDate )
-          .add( ( new Date )
-            .getTimezoneOffset(), 'minutes' )
-          .format( "DD.MM.yyyy hh:mm" ) + ( d.endDate ? " - " + moment.unix( d.endDate )
-            .add( ( new Date )
-              .getTimezoneOffset(), 'minutes' )
-            .format( "DD.MM.yyyy hh:mm" ) : "" ) )
-        .toLowerCase()
-        .includes( search.toLowerCase() ) ) ) )
+        .includes( search.toLowerCase() ) ) ) || moment.unix( task.deadline ).add( ( new Date ).getTimezoneOffset(), 'minutes' ).format( "DD.MM.yyyy hh:mm" ).includes( searchStatus.toLowerCase() )  )
   }, [ filteredByStatusCheckboxes, search ] )
 
   const colouredTasks = useMemo( () => {
@@ -250,20 +233,19 @@ export default function TaskList( props ) {
           return ( <span style={{display: "block"}} key={assigned._id}>{body}</span> )
         } );
 
-        // DEADLINES
-        newTask.deadlines = task.deadlines.map( deadline => {
-          let date = `${moment.unix(deadline.startDate).add((new Date).getTimezoneOffset(), 'minutes').format("DD.MM.yyyy hh:mm")} ${deadline.endDate ? " - " + moment.unix(deadline.endDate).add((new Date).getTimezoneOffset(), 'minutes').format("DD.MM.yyyy hh:mm") : ""}`;
-
-          let startIndex = date.toLowerCase()
-            .indexOf( search.toLowerCase() );
-          let endIndex = startIndex + search.length;
-
-          let body = date;
-          if ( search.length > 0 && startIndex > -1 ) {
-            body = ( <span> {date.substring( 0, startIndex )} <span style={{ backgroundColor: "yellow"}}> {date.substring( startIndex, endIndex )} </span> {date.substring(endIndex )} </span> );
+        // DEADLINE
+        if (!task.deadline) {
+          newTask.deadline = "";
+        } else {
+          let date = `${moment.unix(task.deadline).add((new Date).getTimezoneOffset(), 'minutes').format("DD.MM.yyyy hh:mm")}`;
+          if ( search.length > 0 && date.toLowerCase().includes( search.toLowerCase() ) ) {
+            let startIndex = date.toLowerCase().indexOf( search.toLowerCase() );
+            let endIndex = startIndex + search.length;
+            newTask.deadline = <span> {date.substring( 0, startIndex )} <span style={{ backgroundColor: "yellow"}}> {date.substring( startIndex, endIndex )} </span> {date.substring(endIndex )} </span>;
+          } else {
+            newTask.deadline = date;
           }
-          return ( <span key={date} style={{display: "block"}} key={deadline._id}>{body}</span> )
-        } );
+        }
 
         // ACTIONS
         newTask.actions = task.actions.map( ( action, index ) => {
@@ -330,6 +312,15 @@ export default function TaskList( props ) {
       } )
     },
     [ globalFilteredTasks ] );
+
+
+    const durationsReducer = (accumulator, action) => accumulator + (action.duration ? parseInt(action.duration) : 0);
+    const actionsReducer = (acc, task) => acc + (task.actions ? task.actions.reduce(durationsReducer, 0) : 0);
+    const totalHours = tasks ? tasks.reduce(actionsReducer, 0) : 0;
+
+    const priceReducer = (accumulator, material) => accumulator + (material.price ? parseInt(material.price)*parseInt(material.amount) : 0);
+    const materialsReducer = (acc, task) => acc + (task.materials ? task.materials.reduce(priceReducer, 0) : 0);
+    const totalPrice = tasks ? tasks.reduce(materialsReducer, 0) : 0;
 
   return (
     <List>
@@ -453,10 +444,10 @@ export default function TaskList( props ) {
                       <Input value={searchAssigned} onChange={(e) => setSearchAssigned(e.target.value)} />
                     </td>
                   );
-                  case "deadlines":
+                  case "deadline":
                   return (
                     <td key={col.value}>
-                      <Input value={searchDeadlines} onChange={(e) => setSearchDeadlines(e.target.value)} />
+                      <Input value={searchDeadline} onChange={(e) => setSearchDeadline(e.target.value)} />
                     </td>
                   );
                 }
@@ -471,6 +462,8 @@ export default function TaskList( props ) {
           )}
         </tbody>
       </table>
+      <span style={{display: "block"}}>{`Total duration: ${totalHours} hours`}</span>
+      <span>{`Total price: ${totalPrice} eur`}</span>
     </List>
   );
 };
