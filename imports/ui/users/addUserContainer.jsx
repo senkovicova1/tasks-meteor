@@ -15,6 +15,9 @@ import {
 import UserForm from './userForm';
 
 import {
+  Accounts
+} from 'meteor/accounts-base';
+import {
   LinkButton
 } from '../../other/styles/styledComponents';
 
@@ -25,7 +28,7 @@ export default function AddUserContainer( props ) {
   const toggleAddUserModal = () => showAddUserModal( !addUserModalOpen );
 
   const addNewUser = ( name, surname, showMyTasks, email, password ) => {
-    Meteor.users.insert( {
+    Accounts.createUser( {
       password,
       email,
       profile: {

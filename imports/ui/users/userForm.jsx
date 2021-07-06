@@ -22,6 +22,7 @@ export default function UserForm( props ) {
     onSubmit,
     onRemove,
     onCancel,
+    isSignIn,
   } = props;
 
   const [ name, setName ] = useState( "" );
@@ -144,7 +145,7 @@ export default function UserForm( props ) {
         );
       }}
         >
-        Save
+        { isSignIn ? "Sign in" : "Save"}
       </FullButton>
     </ButtonRow>
 

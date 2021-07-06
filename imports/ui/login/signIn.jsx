@@ -12,7 +12,7 @@ import AddUser from '../users/userForm';
 
 export default function SignInForm( props ) {
 
-  const createUser = ( name, surname, email, showMyTasks, password ) => {
+  const createUser = ( name, surname, showMyTasks, email, password ) => {
     Accounts.createUser( {
       password,
       email,
@@ -25,6 +25,6 @@ export default function SignInForm( props ) {
   };
 
   return (
-    <AddUser onSubmit={createUser}/>
+    <AddUser onSubmit={createUser} isSignIn/>
   );
 };
