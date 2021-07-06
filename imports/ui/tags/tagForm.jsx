@@ -49,11 +49,12 @@ export default function TagForm( props ) {
     <Form>
 
       <section>
-        <label htmlFor="title2">Title</label>
+        <label htmlFor="title">Title</label>
         <Input
-          id="title2"
+          id="title"
           name="title"
           type="text"
+          placeholder="Enter title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           />
@@ -65,6 +66,7 @@ export default function TagForm( props ) {
           id="description"
           name="description"
           type="text"
+          placeholder="Enter description"
           value={description}
           onChange={(e) =>  setDescription(e.target.value)}
           />
@@ -72,33 +74,36 @@ export default function TagForm( props ) {
 
       <section>
         <label  htmlFor="color">Color</label>
-          <Input
-              type="color"
-              name="color"
-              placeholder="Choose colour"
-              value={color}
-              onChange={(e) => setColor(e.target.value)}
+        <Input
+          type="color"
+          name="color"
+          id="color"
+          placeholder="Choose colour"
+          value={color}
+          onChange={(e) => setColor(e.target.value)}
           />
       </section>
 
-<ButtonRow>
-
-      <FullButton colour="grey" onClick={(e) => {e.preventDefault(); onCancel();}}>Cancel</FullButton>
-      {onRemove &&
-        <FullButton colour="red" onClick={(e) => {e.preventDefault(); onRemove(tagId); onCancel();}}>Delete</FullButton>
-      }
-      <FullButton
-        colour=""
-        disabled={title.length === 0}
-        onClick={(e) => {e.preventDefault(); onSubmit(
-          title,
-          description,
-          color,
-        );}}
-        >
-        Save
-      </FullButton>
-    </ButtonRow>
+      <ButtonRow>
+        <FullButton colour="grey" onClick={(e) => {e.preventDefault(); onCancel();}}>Cancel</FullButton>
+        {onRemove &&
+          <FullButton colour="red" onClick={(e) => {e.preventDefault(); onRemove(tagId); onCancel();}}>Delete</FullButton>
+        }
+        <FullButton
+          colour=""
+          disabled={title.length === 0}
+          onClick={(e) => {
+            e.preventDefault();
+            onSubmit(
+              title,
+              description,
+              color,
+            );
+          }}
+          >
+          Save
+        </FullButton>
+      </ButtonRow>
 
     </Form>
   );

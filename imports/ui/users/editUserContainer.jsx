@@ -1,6 +1,5 @@
 import React, {
   useState,
-  useMemo,
   useEffect
 } from 'react';
 
@@ -53,7 +52,7 @@ export default function EditUserContainer( props ) {
 
   const removeUser = ( userId ) => {
     if ( window.confirm( "Are you sure you want to permanently remove this user?" ) ) {
-      UsersCollection.remove( {
+      Meteor.users.remove( {
         _id: userId
       } );
     }
@@ -66,7 +65,7 @@ export default function EditUserContainer( props ) {
   return (
     <Modal isOpen={editUserModalOpen} toggle={() => setChosenUser( null )}>
       <ModalBody>
-        <UserForm {...user} onSubmit={editUser} onCancel={closeModal} onRemove={removeUser}/>
+        <UserForm {...user} onSubmit={editUser} onCancel={closeModal}/>
       </ModalBody>
     </Modal>
   );

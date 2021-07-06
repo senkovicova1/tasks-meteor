@@ -18,7 +18,9 @@ export default function Header( props ) {
   return (
     <PageHeader>
       <h1>LanTask</h1>
-      <LinkButton type="submit" font="white" onClick={logout}><Icon  iconName="SignOut" /></LinkButton>
+      {!props.location.pathname.includes("login") &&
+        <LinkButton type="submit" font="white" onClick={(e) => {e.preventDefault(); props.history.push("/login"); logout();}}><Icon  iconName="SignOut" /></LinkButton>
+      }
     </PageHeader>
   );
 };

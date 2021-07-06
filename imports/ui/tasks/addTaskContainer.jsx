@@ -1,6 +1,5 @@
 import React, {
-  useState,
-  useMemo
+  useState
 } from 'react';
 
 import {
@@ -54,13 +53,13 @@ export default function AddTaskContainer( props ) {
   }
 
   return (
-      <div>
+    <div>
       <LinkButton onClick={toggleAddTaskModal}> <Icon iconName="Add"/> Task </LinkButton>
       <Modal isOpen={addTaskModalOpen} toggle={toggleAddTaskModal}>
         <ModalBody>
           <TaskForm users={users} tags={tags} onSubmit={addNewTask} onCancel={closeModal}/>
         </ModalBody>
       </Modal>
-      </ div>
+    </div>
   );
 };

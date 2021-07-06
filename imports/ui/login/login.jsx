@@ -1,43 +1,59 @@
 import {
   Meteor
 } from 'meteor/meteor';
+
 import React, {
   useState
 } from 'react';
 
+import {
+  Form,
+  Input,
+  FullButton
+} from "../../other/styles/styledComponents";
+
 export default function LoginForm( props ) {
+
+  const { history } = props;
+
   const [ email, setEmail ] = useState( '' );
   const [ password, setPassword ] = useState( '' );
 
-  const submit = e => {
+  const onSubmit = e => {
     e.preventDefault();
-
+    history.push("tasks/all/all");
     Meteor.loginWithPassword( email, password );
   };
 
   return (
-    <form onSubmit={submit} className="login-form">
-      <label htmlFor="email">Email</label>
+    <Form onSubmit={onSubmit}>
 
-      <input
-        type="text"
-        placeholder="Email"
-        name="email"
-        required
-        onChange={e => setEmail(e.target.value)}
-      />
+      <section>
+        <label htmlFor="email">Email</label>
+        <Input
+          type="text"
+          placeholder="Email"
+          name="email"
+          id="email"
+          required
+          onChange={e => setEmail(e.target.value)}
+          />
+      </section>
 
-      <label htmlFor="password">Password</label>
+      <section>
+        <label htmlFor="password">Password</label>
+        <Input
+          type="password"
+          placeholder="Password"
+          name="password"
+          id="password"
+          required
+          onChange={e => setPassword(e.target.value)}
+          />
+      </section>
 
-      <input
-        type="password"
-        placeholder="Password"
-        name="password"
-        required
-        onChange={e => setPassword(e.target.value)}
-      />
+      <FullButton type="submit" style={{marginLeft: "auto"}}>Log In</FullButton>
 
-      <button type="submit">Log In</button>
-    </form>
+    </Form>
   );
 };

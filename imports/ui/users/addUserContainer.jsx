@@ -1,6 +1,5 @@
 import React, {
-  useState,
-  useMemo
+  useState
 } from 'react';
 
 import {
@@ -40,19 +39,18 @@ export default function AddUserContainer( props ) {
     showAddUserModal( false );
   };
 
-
   const closeModal = () => {
     showAddUserModal( false );
   }
 
   return (
-      <div>
+    <div>
       <LinkButton onClick={toggleAddUserModal}> <Icon iconName="Add"/> User </LinkButton>
       <Modal isOpen={addUserModalOpen} toggle={toggleAddUserModal}>
         <ModalBody>
           <UserForm onSubmit={addNewUser} onCancel={closeModal}/>
         </ModalBody>
       </Modal>
-      </ div>
+    </div>
   );
 };

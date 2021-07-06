@@ -87,17 +87,12 @@ export const MATERIAL_COLUMNS = [ columns.MATERIAL, columns.TITLE, columns.STATU
 export const statuses = [
   {
     label: "Open",
-    value: "open",
+    value: false,
     colour: "#00b294"
   },
   {
-    label: "Pending",
-    value: "pending",
-    colour: "#de963c"
-    },
-  {
     label: "Closed",
-    value: "closed",
+    value: true,
     colour: "#6f6262"
       }
 ]

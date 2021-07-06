@@ -28,6 +28,7 @@ import {
 import AddTagContainer from './tags/addTagContainer';
 import AddUserContainer from './users/addUserContainer';
 import EditTagContainer from './tags/editTagContainer';
+import AddTaskContainer from './tasks/addTaskContainer';
 
 import {
   WHOLE_TABLE,
@@ -53,7 +54,8 @@ export default function Sidebar( props ) {
     .fetch() );
   const tags = useTracker( () => TagsCollection.find( {} )
     .fetch() );
-  const users = [];
+  const users = useTracker( () => Meteor.users.find( {} )
+    .fetch() );
 
   const [ search, setSearch ] = useState( "" );
   const [ chosenTask, setChosenTask ] = useState( null );
@@ -79,13 +81,13 @@ export default function Sidebar( props ) {
     <StyledSidebar>
       <ul>
         <SidebarLink key="myTasks" active={listType === MY_TASKS}>
-          <Link to={`/tasks/${tagID}/my-tasks`}><Icon iconName="TaskLogo"/> My Tasks</Link>
+          <Link to={`/tasks/${tagID}/my-tasks`}><Icon iconName="UserFollowed"/> My Tasks</Link>
         </SidebarLink>
         <SidebarLink key="planned" active={listType === PLANNED}>
-          <Link to={`/tasks/${tagID}/planned`}><Icon iconName="TaskLogo"/> Planned</Link>
+          <Link to={`/tasks/${tagID}/planned`}><Icon iconName="Calendar"/> Planned</Link>
         </SidebarLink>
         <SidebarLink key="important" active={listType === IMPORTANT}>
-          <Link to={`/tasks/${tagID}/important`}><Icon iconName="TaskLogo"/> Important</Link>
+          <Link to={`/tasks/${tagID}/important`}><Icon iconName="FavoriteStar"/> Important</Link>
         </SidebarLink>
         <SidebarLink key="allTasks" active={listType === WHOLE_TABLE}>
           <Link to={`/tasks/${tagID}/all`}><Icon iconName="TaskLogo"/> All tasks</Link>
@@ -103,14 +105,18 @@ export default function Sidebar( props ) {
           </SidebarLink>
         ))}
         <hr />
-        <SidebarLink key="users"  active={match.url.includes("users")}>
-          <Link to="/users"><Icon iconName="Settings"/> Users</Link>
-        </SidebarLink>
+        <SidebarLink key="addTask">
+        <AddTaskContainer users={users} tags={tags} />
+      </SidebarLink>
         <SidebarLink key="addTag">
           <AddTagContainer/>
         </SidebarLink>
         <SidebarLink key="addUser">
           <AddUserContainer/>
+        </SidebarLink>
+        <hr/>
+        <SidebarLink key="users"  active={match.url.includes("users")}>
+          <Link to="/users"><Icon iconName="Settings"/> Users</Link>
         </SidebarLink>
       </ul>
 

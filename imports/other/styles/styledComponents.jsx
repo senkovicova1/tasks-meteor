@@ -65,6 +65,7 @@ button:first-child{
 
 button:last-child{
   margin-left: auto;
+  margin-right: 0em;
 }
 `;
 
@@ -159,6 +160,7 @@ table {
   }
 
   tbody>tr:first-child{
+    display: none;
     background-color: transparent;
     border-bottom: 2px solid ${backgroundColour};
     td{
@@ -179,6 +181,8 @@ export const SearchSection = styled.section `
 display: flex;
 justify-content: flex-start;
 align-items: center;
+
+margin: 1em 0em;
 
 input, button {
   margin-right: 1em;
@@ -210,24 +214,21 @@ section {
   label{
     margin: 0px;
     font-weight: 500;
-    width: 15%;
+    width: 200px;
   }
-  input:not(#title)[type=text], input:not(#title)[type=color], &>div {
+  input:not(#title)[type=text], input:not(#title)[type=color], input:not(#title)[type=password], &>div {
     width: 85%;
   }
 
-input[type=checkbox] + label{
-    width: 30%;
-    order: -1;
+  input[type=checkbox] + label{
+      width: 30%;
+      order: -1;
+    }
+
+input[type=checkbox]{
+    margin-right: 5px;
   }
 
-  span.statuses {
-    input[type=checkbox] {
-      margin-right: 5px;
-    }
-    display: inline-block;
-    flex: auto;
-  }
 }
 `;
 
@@ -321,7 +322,8 @@ padding-left: 0em;
 `;
 
 export const GroupButton = styled.button `
-  display: inline;
+  width: -webkit-fill-available;
+
   background-color: ${(props) => props.colour ? props.colour : "white"};
   color: ${(props) => props.colour ? "white" : basicBlueColour};
   outline: none !important;
@@ -329,13 +331,18 @@ export const GroupButton = styled.button `
 
   border-radius: 0px;
 
-  &:first-of-type{
-    border-radius: 5px 0px 0px 5px;
-    border-right: 0px;
-  }
-
   &:last-of-type{
     border-left: 0px;
-    border-radius: 0px 5px 5px 0px;
   }
+`;
+
+export const LoginContainer = styled.div`
+width: 500px;
+margin: 10% auto auto auto;
+background-color: white;
+&>div {
+   display: flex;
+   justify-content: space-between;
+}
+
 `;

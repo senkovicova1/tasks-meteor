@@ -24,19 +24,23 @@ import {
 export default function MainPage( props ) {
   const user = useTracker( () => Meteor.user() );
 
-  if ( !user ) {
-    return <Login />
-  }
   return (
     <div>
-      <Header />
-      <Content>
-        <BrowserRouter>
-          <Route exact path={["/", "/tasks", "/tasks/:tagID", "/tasks/:tagID/:listType", "/users", "/users/:userID"]} component={Sidebar} />
-          <Route exact path={["/", "/tasks", "/tasks/:tagID", "/tasks/:tagID/:listType"]} component={TaskList} />
-          <Route exact path={["/users", "/users/:userID"]} component={UserList} />
-        </BrowserRouter>
-      </Content>
+      <BrowserRouter>
+        <Route path={"/"} component={Header} />
+        {!user &&
+          <Content>
+            <Route path={"/"} component={Login} />
+          </Content>
+        }
+        {user &&
+          <Content>
+            <Route exact path={["/", "/tasks", "/tasks/:tagID", "/tasks/:tagID/:listType", "/users", "/users/:userID"]} component={Sidebar} />
+            <Route exact path={["/", "/tasks", "/tasks/:tagID", "/tasks/:tagID/:listType"]} component={TaskList} />
+            <Route exact path={["/users", "/users/:userID"]} component={UserList} />
+          </Content>
+        }
+      </BrowserRouter>
     </div>
   );
 };

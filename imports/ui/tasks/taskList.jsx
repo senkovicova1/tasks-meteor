@@ -87,7 +87,7 @@ export default function TaskList( props ) {
 
   const [ displayColumns, setDisplayColumns ] = useState( [] );
   const [ listType, setListType ] = useState( null );
-  const [ chosenStatuses, setChosenStatuses ] = useState([]);
+  const [ showClosed, setShowClosed ] = useState(false);
 
   const handleShowMyTasksChange = useCallback(() => {
     let currentUser = users.find(user => user._id === userId);
@@ -140,7 +140,8 @@ export default function TaskList( props ) {
     tasks.map( task => ( {
       ...task,
       tag: tags.find( tag => tag._id === task.tag ),
-      assigned: users.filter( user => task.assigned.includes( user._id ) )
+      assigned: users.filter( user => task.assigned.includes( user._id ) ),
+      status: statuses.find(s => s.value === task.status),
     } ) ), [ tasks, tags, users ] );
 
   const filteredByListTypeTasks = useMemo( () => {
@@ -170,7 +171,7 @@ export default function TaskList( props ) {
 
   const filteredTasks = useMemo( () => {
     return filteredByOwnerTasks.filter( task => task.title.toLowerCase().includes( searchTitle.toLowerCase() ) &&
-    task.status.toLowerCase().includes( searchStatus.toLowerCase() ) &&
+    task.status.label.toLowerCase().includes( searchStatus.toLowerCase() ) &&
     task.description.toLowerCase().includes( searchDescription.toLowerCase() ) &&
     ( searchActions.length === 0 ||
       ( task.actions && task.actions.some( a => a.title.toLowerCase().includes( searchActions.toLowerCase() ) ) ) ) &&
@@ -186,12 +187,12 @@ export default function TaskList( props ) {
   }, [ filteredByOwnerTasks, searchTitle, searchStatus, searchDescription, searchActions, searchDuration, searchMaterial, searchAssigned, searchDeadline, showMyTasks ] );
 
   const filteredByStatusCheckboxes = useMemo(() => {
-    return filteredTasks.filter(task => chosenStatuses.length === 0 || chosenStatuses.length === statuses.length || chosenStatuses.includes(task.status));
-  }, [filteredTasks, chosenStatuses])
+    return filteredTasks.filter(task => showClosed || !task.status.value);
+  }, [filteredTasks, showClosed])
 
   const globalFilteredTasks = useMemo( () => {
     return filteredByStatusCheckboxes.filter( task => task.title.toLowerCase()
-      .includes( search.toLowerCase() ) || task.status.toLowerCase()
+      .includes( search.toLowerCase() ) || task.status.label.toLowerCase()
       .includes( search.toLowerCase() ) || task.description.toLowerCase()
       .includes( search.toLowerCase() ) || ( task.actions && task.actions.some( a => ( a.title + a.duration + " hours" )
         .toLowerCase()
@@ -205,7 +206,10 @@ export default function TaskList( props ) {
   const colouredTasks = useMemo( () => {
       return globalFilteredTasks.map( ( task ) => {
         let newTask = {
-          originalTask: task,
+          originalTask: {
+            ...task,
+            status: task.status.value,
+          }
         };
 
         // TITLE
@@ -220,12 +224,12 @@ export default function TaskList( props ) {
         // STATUS
         if ( search.length > 0 && task.status.toLowerCase()
           .includes( search.toLowerCase() ) ) {
-          let startIndex = task.status.toLowerCase()
+          let startIndex = task.status.label.toLowerCase()
             .indexOf( search.toLowerCase() );
           let endIndex = startIndex + search.length;
-          newTask.status = <span> {task.status.substring( 0, startIndex - 1 )} <span style={{ backgroundColor: "yellow" }}> {task.status.substring( startIndex, endIndex )} </span> {task.status.substring(endIndex )} </span>;
+          newTask.status = <span> {task.status.label.substring( 0, startIndex - 1 )} <span style={{ backgroundColor: "yellow" }}> {task.status.label.substring( startIndex, endIndex )} </span> {task.status.label.substring(endIndex )} </span>;
         } else {
-          newTask.status = task.status;
+          newTask.status = task.status.label;
         }
 
         // DESCRIPTION
@@ -344,80 +348,36 @@ export default function TaskList( props ) {
 
   return (
     <List>
-      <h2>{(listType?.charAt(0).toUpperCase() + listType?.slice(1)).toString() + (listType === WHOLE_TABLE ? " tasks" : "")}</h2>
+      <h2>{(listType?.charAt(0).toUpperCase() + listType?.slice(1)).toString().replace("-", " ") + ([WHOLE_TABLE, PLANNED, IMPORTANT].includes(listType) ? " tasks" : "")}</h2>
+
       <SearchSection>
         <Input width="30%" placeholder="Search" value={search} onChange={(e) => setSearch(e.target.value)} />
-        <AddTaskContainer users={users} tags={tags} />
-          <section key="allStatuses">
-            <Input
-              id="allStatuses"
-              type="checkbox"
-              name="allStatuses"
-              style={{
-                marginRight: "0.2em"
-              }}
-              checked={chosenStatuses.length === 0 || chosenStatuses.length === statuses.length}
-              onChange={() => {
-                if (chosenStatuses.length === statuses.length){
-                  setChosenStatuses([]);
-                } else {
-                  setChosenStatuses(statuses.map(s => s.value));
-                }
-              }}
-              />
-            <label htmlFor="allStatuses">All</label>
-          </section>
-        {
-          statuses.map(status => (
-          <section key={status.value}>
-            <Input
-              id={status.value}
-              type="checkbox"
-              name={status.value}
-              style={{
-                marginRight: "0.2em",
-                marginLeft: "1em"
-              }}
-              checked={chosenStatuses.includes(status.value)}
-              onChange={() => {
-                let newChosenStatuses = [...chosenStatuses];
-                if (chosenStatuses.includes(status.value)){
-                   newChosenStatuses = newChosenStatuses.filter(s => s !== status.value);
-                } else {
-                  newChosenStatuses.push(status.value);
-                }
-                setChosenStatuses(newChosenStatuses);
-              }}
-              />
-            <label htmlFor={status.value}>{status.label}</label>
-          </section>
-        ))
-        }
-        {listType !== MY_TASKS &&
-        <section key="showMyTasks">
+        <section key="allStatuses">
           <Input
-            id="showMyTasks"
+            id="allStatuses"
             type="checkbox"
-            name="showMyTasks"
+            name="allStatuses"
             style={{
-              marginRight: "0.2em",
-              marginLeft: "1em"
+              marginRight: "0.2em"
             }}
-            checked={showMyTasks}
-            onChange={handleShowMyTasksChange}
+            checked={showClosed}
+            onChange={() => setShowClosed(!showClosed)}
             />
-          <label htmlFor="showMyTasks">My tasks</label>
+          <label htmlFor="allStatuses">Show closed</label>
         </section>
-      }
       </SearchSection>
+
       <EditTaskContainer users={users} tags={tags} task={chosenTask} setChosenTask={setChosenTask}/>
+
       <table>
         <thead>
           <tr>
             {displayColumns.map(col => <th  key={col.value} width={col.width[listType]}>{col.label}</th>)}
           </tr>
         </thead>
+        
         <tbody>
+
           <tr key="filters">
             {
               displayColumns.map(col => {
@@ -476,14 +436,21 @@ export default function TaskList( props ) {
           </tr>
 
           {colouredTasks.map(task =>
-            <tr key={task._id} style={listType === PLANNED && task.originalTask.deadline <= moment().unix() ? {backgroundColor: "mistyrose"} : {}} onClick={() => setChosenTask(task.originalTask)}>
+            <tr
+              key={task.originalTask._id}
+              style={listType === PLANNED && task.originalTask.deadline <= moment().unix() ? {backgroundColor: "mistyrose"} : {}}
+              onClick={() => setChosenTask(task.originalTask)}
+              >
               {displayColumns.map(col => (<td key={col.value}>{task[col.value]}</td>))}
             </tr>
           )}
+
         </tbody>
       </table>
+
       <span style={{display: "block"}}>{`Total duration: ${totalHours} hours`}</span>
       <span>{`Total price: ${totalPrice} eur`}</span>
+
     </List>
   );
 };

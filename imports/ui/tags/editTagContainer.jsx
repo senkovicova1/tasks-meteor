@@ -1,6 +1,5 @@
 import React, {
   useState,
-  useMemo,
   useEffect
 } from 'react';
 
@@ -26,11 +25,7 @@ export default function EditTagContainer( props ) {
   const [ editTagModalOpen, showEditTagModal ] = useState( false );
 
   useEffect( () => {
-    if ( tag ) {
-      showEditTagModal( true )
-    } else {
-      showEditTagModal( false )
-    }
+      showEditTagModal( tag ? true : false );
   }, [ tag ] )
 
   const editTag = ( title, description, color ) => {

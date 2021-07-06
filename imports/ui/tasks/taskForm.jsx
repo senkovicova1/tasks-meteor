@@ -11,10 +11,6 @@ import {
 } from '@fluentui/react/lib/Icon';
 
 import {
-  statuses
-} from '../../other/constants';
-
-import {
   selectStyle
 } from '../../other/styles/selectStyles';
 
@@ -53,7 +49,7 @@ export default function TaskForm( props ) {
   const [ title, setTitle ] = useState( "" );
   const [ important, setImportant ] = useState( false );
   const [ description, setDescription ] = useState( "" );
-  const [ status, setStatus ] = useState( {} );
+  const [ status, setStatus ] = useState( false );
   const [ assigned, setAssigned ] = useState( [] );
   const [ tag, setTag ] = useState( null );
   const [ deadline, setDeadline ] = useState( null );
@@ -84,9 +80,9 @@ export default function TaskForm( props ) {
       setDescription( "" );
     }
     if ( taskStatus ) {
-      setStatus( statuses.find( s => s.value === taskStatus ) );
+      setStatus( taskStatus );
     } else {
-      setStatus( statuses[ 0 ] );
+      setStatus( false );
     }
     if ( taskAssigned ) {
       setAssigned( createReactSelectValue( taskAssigned.map( user => ( {
@@ -144,27 +140,19 @@ export default function TaskForm( props ) {
     <Form>
 
       <section className="useOffset">
+          <Input
+            type="checkbox"
+            checked={status}
+            onChange={(e) =>{setStatus(!status)}}
+            />
+          <TitleInput id="title" placeholder="NEW TASK" name="title" value={title} onChange={(e) => setTitle(e.target.value)} />
         <LinkButton font="gold" onClick={(e) => {e.preventDefault(); setImportant(!important)}}>{important ? <Icon iconName="FavoriteStarFill"/> : <Icon iconName="FavoriteStar"/>}</LinkButton>
-        <TitleInput id="title" placeholder="NEW TASK" name="title" value={title} onChange={(e) => setTitle(e.target.value)} />
           {onRemove &&
             <LinkButton font="red" onClick={(e) => {e.preventDefault(); onRemove(taskId); onCancel();}}><Icon iconName="Delete"/></LinkButton>
           }
       </section>
 
       <hr/>
-
-      <section className="useOffset">
-        <label  htmlFor="status">Status</label>
-        {statuses.map(s =>
-          <span className="statuses">
-            <Input
-              type="checkbox"
-              checked={s.value === status.value }
-              onChange={(e) =>{setStatus(s)}}
-              />{s.label}
-            </span>
-          )}
-        </section>
 
       <section className="useOffset">
         <label htmlFor="assigned">Assigned</label>
@@ -439,7 +427,7 @@ export default function TaskForm( props ) {
             title,
             important,
             description,
-            status.value,
+            status,
             assigned.map(user => user._id),
             tag?._id,
             actions,

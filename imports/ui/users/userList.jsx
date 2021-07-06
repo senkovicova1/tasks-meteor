@@ -32,22 +32,18 @@ export default function UserList( props ) {
       user.profile.name.toLowerCase()
       .includes( search.toLowerCase() ) || user.profile.surname.toLowerCase()
       .includes( search.toLowerCase() )
-      /* || user.emails[ 0 ].address.toLowerCase()
-            .includes( search.toLowerCase() )*/
     )
     .filter( user => user.profile.name.toLowerCase()
       .includes( searchName.toLowerCase() ) && user.profile.surname.toLowerCase()
       .includes( searchSurname.toLowerCase() )
-      /*&& user.emails[ 0 ].address.toLowerCase()
-           .includes( searchEmail.toLowerCase() ) */
     ), [ users, search ] );
 
   return (
     <List>
       <h2>Users</h2>
-        <SearchSection>
-          <Input width="30%" placeholder="Search" value={search} onChange={(e) => setSearch(e.target.value)} />
-          <AddUserContainer/>
+      <SearchSection>
+        <Input width="30%" placeholder="Search" value={search} onChange={(e) => setSearch(e.target.value)} />
+        <AddUserContainer/>
       </SearchSection>
       <EditUserContainer user={chosenUser} setChosenUser={setChosenUser}/>
       <table>
@@ -75,10 +71,10 @@ export default function UserList( props ) {
               <td>{user.profile.surname}</td>
               <td>{user.profile.name}</td>
               <td>{user.emails ? user.emails[0].address : "Cannot access email"}</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </List>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </List>
   );
 };

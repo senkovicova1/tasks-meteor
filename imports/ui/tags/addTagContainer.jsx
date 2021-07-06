@@ -1,6 +1,5 @@
 import React, {
-  useState,
-  useMemo
+  useState
 } from 'react';
 
 import {
@@ -40,13 +39,13 @@ export default function AddTagContainer( props ) {
   }
 
   return (
-      <div>
+    <div>
       <LinkButton onClick={toggleAddTagModal}> <Icon iconName="Add"/> Tag </LinkButton>
       <Modal isOpen={addTagModalOpen} toggle={toggleAddTagModal}>
         <ModalBody>
           <TagForm onSubmit={addNewTag} onCancel={closeModal}/>
         </ModalBody>
       </Modal>
-      </ div>
+    </div>
   );
 };
