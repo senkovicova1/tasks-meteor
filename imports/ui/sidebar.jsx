@@ -31,6 +31,8 @@ import EditTagContainer from './tags/editTagContainer';
 
 import {
   WHOLE_TABLE,
+  PLANNED,
+  IMPORTANT,
   MY_TASKS,
   WITH_ACTIONS,
   WITH_MATERIALS
@@ -76,11 +78,17 @@ export default function Sidebar( props ) {
   return (
     <StyledSidebar>
       <ul>
-        <SidebarLink key="allTasks" active={listType === WHOLE_TABLE}>
-          <Link to={`/tasks/${tagID}/all`}><Icon iconName="TaskLogo"/> All tasks</Link>
-        </SidebarLink>
         <SidebarLink key="myTasks" active={listType === MY_TASKS}>
           <Link to={`/tasks/${tagID}/my-tasks`}><Icon iconName="TaskLogo"/> My Tasks</Link>
+        </SidebarLink>
+        <SidebarLink key="planned" active={listType === PLANNED}>
+          <Link to={`/tasks/${tagID}/planned`}><Icon iconName="TaskLogo"/> Planned</Link>
+        </SidebarLink>
+        <SidebarLink key="important" active={listType === IMPORTANT}>
+          <Link to={`/tasks/${tagID}/important`}><Icon iconName="TaskLogo"/> Important</Link>
+        </SidebarLink>
+        <SidebarLink key="allTasks" active={listType === WHOLE_TABLE}>
+          <Link to={`/tasks/${tagID}/all`}><Icon iconName="TaskLogo"/> All tasks</Link>
         </SidebarLink>
         <SidebarLink key="materials" active={listType === WITH_MATERIALS}>
           <Link to={`/tasks/${tagID}/materials`}><Icon iconName="ShoppingCart"/> Materials</Link>

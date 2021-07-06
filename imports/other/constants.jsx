@@ -1,5 +1,7 @@
 export const WHOLE_TABLE = "all";
 export const MY_TASKS = "my-tasks";
+export const PLANNED = "planned";
+export const IMPORTANT = "important";
 export const WITH_ACTIONS = 'actions';
 export const WITH_MATERIALS = 'materials';
 

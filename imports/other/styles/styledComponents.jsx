@@ -203,18 +203,30 @@ section {
   align-items: center;
   min-height: 3em;
 
+  i {
+    font-size: 1.5em;
+  }
+
   label{
     margin: 0px;
     font-weight: 500;
     width: 15%;
   }
-  input:not(#title), &>div {
+  input:not(#title)[type=text], input:not(#title)[type=color], &>div {
     width: 85%;
   }
 
 input[type=checkbox] + label{
     width: 30%;
     order: -1;
+  }
+
+  span.statuses {
+    input[type=checkbox] {
+      margin-right: 5px;
+    }
+    display: inline-block;
+    flex: auto;
   }
 }
 `;

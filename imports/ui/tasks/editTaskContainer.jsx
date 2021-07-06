@@ -35,10 +35,13 @@ export default function EditTaskContainer( props ) {
     }
   }, [ task ] )
 
-  const editTask = ( title, description, status, assigned, tag, actions, materials, deadline ) => {
+  const editTask = ( title, important, description, status, assigned, tag, actions, materials, deadline ) => {
     let data = {};
     if ( task.title !== title ) {
       data.title = title;
+    }
+    if ( task.important !== important ) {
+      data.important = important;
     }
     if ( task.description !== description ) {
       data.description = description;

@@ -35,6 +35,7 @@ export default function TaskForm( props ) {
   const {
     _id: taskId,
     title: taskTitle,
+    important: taskImportant,
     description: taskDescription,
     status: taskStatus,
     assigned: taskAssigned,
@@ -50,6 +51,7 @@ export default function TaskForm( props ) {
   } = props;
 
   const [ title, setTitle ] = useState( "" );
+  const [ important, setImportant ] = useState( false );
   const [ description, setDescription ] = useState( "" );
   const [ status, setStatus ] = useState( {} );
   const [ assigned, setAssigned ] = useState( [] );
@@ -70,6 +72,11 @@ export default function TaskForm( props ) {
       setTitle( taskTitle );
     } else {
       setTitle( "" );
+    }
+    if ( taskImportant ) {
+      setImportant( taskImportant );
+    } else {
+      setImportant( false );
     }
     if ( taskDescription ) {
       setDescription( taskDescription );
@@ -113,7 +120,7 @@ export default function TaskForm( props ) {
     } else {
       setDeadline( null );
     }
-  }, [ taskTitle, taskDescription, taskStatus, taskAssigned, taskTag, taskActions, taskMaterials, taskDeadline ] )
+  }, [ taskTitle, taskImportant, taskDescription, taskStatus, taskAssigned, taskTag, taskActions, taskMaterials, taskDeadline ] )
 
 
   const createReactSelectValue = ( array, label = "title", value = "_id" ) => {
@@ -137,6 +144,7 @@ export default function TaskForm( props ) {
     <Form>
 
       <section className="useOffset">
+        <LinkButton font="gold" onClick={(e) => {e.preventDefault(); setImportant(!important)}}>{important ? <Icon iconName="FavoriteStarFill"/> : <Icon iconName="FavoriteStar"/>}</LinkButton>
         <TitleInput id="title" placeholder="NEW TASK" name="title" value={title} onChange={(e) => setTitle(e.target.value)} />
           {onRemove &&
             <LinkButton font="red" onClick={(e) => {e.preventDefault(); onRemove(taskId); onCancel();}}><Icon iconName="Delete"/></LinkButton>
@@ -147,8 +155,16 @@ export default function TaskForm( props ) {
 
       <section className="useOffset">
         <label  htmlFor="status">Status</label>
-        {statuses.map(s => <GroupButton colour={s.value === status.value ? s.colour : null} onClick={(e) => {e.preventDefault(); setStatus(s);}}>{s.label}</GroupButton>)}
-      </section>
+        {statuses.map(s =>
+          <span className="statuses">
+            <Input
+              type="checkbox"
+              checked={s.value === status.value }
+              onChange={(e) =>{setStatus(s)}}
+              />{s.label}
+            </span>
+          )}
+        </section>
 
       <section className="useOffset">
         <label htmlFor="assigned">Assigned</label>
@@ -421,6 +437,7 @@ export default function TaskForm( props ) {
           disabled={title.length === 0}
           onClick={(e) => {e.preventDefault(); onSubmit(
             title,
+            important,
             description,
             status.value,
             assigned.map(user => user._id),

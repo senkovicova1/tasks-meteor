@@ -34,9 +34,10 @@ export default function AddTaskContainer( props ) {
 
   const toggleAddTaskModal = () => showAddTaskModal( !addTaskModalOpen );
 
-  const addNewTask = ( title, description, status, assigned, tag, actions, materials, deadline ) => {
+  const addNewTask = ( title, important, description, status, assigned, tag, actions, materials, deadline ) => {
     TasksCollection.insert( {
       title,
+      important,
       description,
       status,
       assigned,

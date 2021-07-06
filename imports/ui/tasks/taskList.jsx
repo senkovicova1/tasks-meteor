@@ -8,6 +8,10 @@ import React, {
 import moment from 'moment';
 
 import {
+  Icon
+} from '@fluentui/react/lib/Icon';
+
+import {
   useTracker
 } from 'meteor/react-meteor-data';
 import {
@@ -26,6 +30,8 @@ import EditTaskContainer from './editTaskContainer';
 import {
   WHOLE_TABLE,
   MY_TASKS,
+  PLANNED,
+  IMPORTANT,
   WITH_ACTIONS,
   WITH_MATERIALS,
   columns,
@@ -118,6 +124,14 @@ export default function TaskList( props ) {
       setDisplayColumns( MATERIAL_COLUMNS );
       setListType( WITH_MATERIALS );
     }
+    if ( newListType === IMPORTANT ) {
+      setDisplayColumns( ALL_COLUMNS );
+      setListType( IMPORTANT );
+    }
+    if ( newListType === PLANNED ) {
+      setDisplayColumns( ALL_COLUMNS );
+      setListType( PLANNED );
+    }
   }, [
     match.params.listType
   ] );
@@ -132,6 +146,12 @@ export default function TaskList( props ) {
   const filteredByListTypeTasks = useMemo( () => {
     if ( !listType || listType === WHOLE_TABLE || listType === MY_TASKS ) {
       return joinedTasks;
+    }
+    if ( listType === IMPORTANT) {
+      return joinedTasks.filter(task => task.important);
+    }
+    if ( listType === PLANNED) {
+      return joinedTasks.sort((t1, t2) => (t1.deadline < t2.deadline) ? 1 : -1);
     }
     if ( listType === WITH_ACTIONS ) {
       return joinedTasks.filter( task => task.actions && task.actions.length > 0 );
@@ -192,9 +212,9 @@ export default function TaskList( props ) {
         if ( search.length > 0 && task.title.toLowerCase().includes( search.toLowerCase() ) ) {
           let startIndex = task.title.toLowerCase().indexOf( search.toLowerCase() );
           let endIndex = startIndex + search.length;
-          newTask.title = <span> {task.title.substring( 0, startIndex - 1 )} <span style={{ backgroundColor: "yellow" }}> {task.title.substring( startIndex, endIndex )} </span> {task.title.substring(endIndex )} </span>;
+          newTask.title = <span> {task.important ? <Icon iconName="FavoriteStarFill" style={{color: "gold"}}/> : null } {task.title.substring( 0, startIndex - 1 )} <span style={{ backgroundColor: "yellow" }}> {task.title.substring( startIndex, endIndex )} </span> {task.title.substring(endIndex )} </span>;
         } else {
-          newTask.title = task.title;
+          newTask.title = <span>{task.important ? <Icon iconName="FavoriteStarFill"  style={{color: "gold"}}/> : null } {task.title} </span>;
         }
 
         // STATUS
@@ -456,7 +476,7 @@ export default function TaskList( props ) {
           </tr>
 
           {colouredTasks.map(task =>
-            <tr key={task._id} onClick={() => setChosenTask(task.originalTask)}>
+            <tr key={task._id} style={listType === PLANNED && task.originalTask.deadline <= moment().unix() ? {backgroundColor: "mistyrose"} : {}} onClick={() => setChosenTask(task.originalTask)}>
               {displayColumns.map(col => (<td key={col.value}>{task[col.value]}</td>))}
             </tr>
           )}

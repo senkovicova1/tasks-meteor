@@ -49,9 +49,9 @@ export default function TagForm( props ) {
     <Form>
 
       <section>
-        <label htmlFor="title">Title</label>
+        <label htmlFor="title2">Title</label>
         <Input
-          id="title"
+          id="title2"
           name="title"
           type="text"
           value={title}
